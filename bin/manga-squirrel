@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'manga-squirrel/cli'
+
+Manga::Squirrel::CLI.start
