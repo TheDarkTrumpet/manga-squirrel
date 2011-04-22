@@ -47,8 +47,8 @@ Or a range of volumes or chapters:
     
 Or a list of volumes or chapters:
 
-    $ manga-squirrel queue naruto --volumes=7,8,9
-    $ manga-squirrel queue naruto --chapters=10,11,12
+    $ manga-squirrel queue naruto --volumes=[7,8,9]
+    $ manga-squirrel queue naruto --chapters=[10,11,12]
 
 You can monitor the progress of the background download queue by running resque-web:
 
