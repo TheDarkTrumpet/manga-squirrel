@@ -15,7 +15,7 @@ module Manga
 
         FileUtils.mkdir_p dir = File.join(series, "#{volume}-#{chapter} #{caption}")
 
-        system 'curl', img, "-o", File.join(dir, "#{page}#{ext}")
+        system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
       end
     end
   end
