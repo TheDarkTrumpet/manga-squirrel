@@ -3,14 +3,14 @@ Version: 0.1.0
 Manga Squirrel
 ----------------
 
-Manga Squirrel is a background multi-threaded mass downloader for the site Manga Fox using [Redis](https://github.com/defunkt/resque) + [Resque](http://redis.io).
+[Manga Squirrel](http://github.com/Erol/manga-squirrel) is a background multi-threaded mass downloader for the site [Manga Fox](http://www.mangafox.com) using [Resque](http://github.com/defunkt/resque). It uses [Nokogiri](http://nokogiri.org) to scrape the site and curl to download the chapter image contents.
 
 Installation
 ------------
 
 ### Redis
 
-Manga Squirrel uses [Resque] for background processing and thus requires the installation of Redis:
+Manga Squirrel depends on [Resque] for background processing and thus requires the installation of Redis:
 
     $ wget http://redis.googlecode.com/files/redis-2.2.4.tar.gz
     $ tar xzf redis-2.2.4.tar.gz
