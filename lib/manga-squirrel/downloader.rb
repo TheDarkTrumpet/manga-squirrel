@@ -78,12 +78,12 @@ module Manga
         doc = Nokogiri::HTML(open(url))
     
         title = doc.css("meta[property='og:title']").attribute('content').value
-        title =~ /(.*?) Manga Vol\.(\d+) Ch\.([0-9\.]+): (.*)$/
+        title =~ /(.*?) Manga Vol\.(\d+) Ch\.([0-9\.]+):? ?(.*)$/
 
         chapter[:series] = $1
         chapter[:volume] = $2
         chapter[:chapter] = $3
-        chapter[:caption] = $4
+        chapter[:caption] = $4 || ''
 
         chapter[:pages] = doc.css("select.middle option[selected=selected]").first.parent.children.count
     
