@@ -13,7 +13,7 @@ module Manga
         img = doc.css('#image').attribute('src').value
         ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
-        FileUtils.mkdir_p dir = File.join(series, "#{volume}-#{chapter} #{caption}")
+        FileUtils.mkdir_p dir = File.join(series, "#{[volume, chapter].compact.join('-')} #{caption}")
 
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
       end

@@ -13,7 +13,7 @@ module Manga
         chapters(series, options).each do |chapter_url|
           chapter = chapter(series, chapter_url)
       
-          puts "QUEUE: #{chapter[:series]} volume #{chapter[:volume]} chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
+          puts "QUEUE: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
       
           1.upto(chapter[:pages]) do |page|
             page_url = chapter_url.gsub /(.*\/)(\d+)(.html)$/, "\\1#{page}\\3"
@@ -37,9 +37,9 @@ module Manga
           .collect { |node| Manga::Squirrel::Downloader::BASE_URL + node.attribute('href').value }
           .reverse
           .select do |url|
-            url =~ /http:\/\/.*?\/manga\/.*?\/v([0-9\.]+)\/c([0-9\.]+)\/\d+\.html/
-            volume = $1.to_f
-            chapter = $2.to_f
+            url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
+            volume = $2.to_f
+            chapter = $3.to_f
             
             volume_filter = eval(options[:volumes])
             volume_pass = case volume_filter.class.name
@@ -78,12 +78,12 @@ module Manga
         doc = Nokogiri::HTML(open(url))
     
         title = doc.css("meta[property='og:title']").attribute('content').value
-        title =~ /(.*?) Manga Vol\.(\d+) Ch\.([0-9\.]+):? ?(.*)$/
+        title =~ /(.*?) Manga (Vol\.(\d+) )?Ch\.([0-9\.]+):? ?(.*)$/
 
         chapter[:series] = $1
-        chapter[:volume] = $2
-        chapter[:chapter] = $3
-        chapter[:caption] = $4 || ''
+        chapter[:volume] = $3
+        chapter[:chapter] = $4
+        chapter[:caption] = $5 || ''
 
         chapter[:pages] = doc.css("select.middle option[selected=selected]").first.parent.children.count
     
