@@ -33,40 +33,39 @@ module Manga
     
         doc = Nokogiri::HTML(open(url))
 
-        list = doc.css("table#listing td a.ch")
-          .collect { |node| Manga::Squirrel::Downloader::BASE_URL + node.attribute('href').value }
-          .reverse
-          .select do |url|
-            url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
-            volume = $2.to_f
-            chapter = $3.to_f
-            
-            volume_filter = eval(options[:volumes])
-            volume_pass = case volume_filter.class.name
-            when "Array", "Range"
-              volume_filter.include?(volume)
-            when "Fixnum", "Float"
-              volume_filter == volume
-            when "TrueClass", "FalseClass"
-              volume_filter
-            else
-              true
-            end
-            
-            chapter_filter = eval(options[:chapters])
-            chapter_pass = case chapter_filter.class.name
-            when "Array", "Range"
-              chapter_filter.include?(chapter)
-            when "Fixnum", "Float"
-              chapter_filter == chapter
-            when "TrueClass", "FalseClass"
-              chapter_filter
-            else
-              true
-            end
-            
-            volume_pass && chapter_pass
+        list = doc.css("table#listing td a.ch").collect { |node| Manga::Squirrel::Downloader::BASE_URL + node.attribute('href').value }
+        list.reverse!
+        list.select do |url|
+          url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
+          volume = $2.to_f
+          chapter = $3.to_f
+          
+          volume_filter = eval(options[:volumes])
+          volume_pass = case volume_filter.class.name
+          when "Array", "Range"
+            volume_filter.include?(volume)
+          when "Fixnum", "Float"
+            volume_filter == volume
+          when "TrueClass", "FalseClass"
+            volume_filter
+          else
+            true
           end
+          
+          chapter_filter = eval(options[:chapters])
+          chapter_pass = case chapter_filter.class.name
+          when "Array", "Range"
+            chapter_filter.include?(chapter)
+          when "Fixnum", "Float"
+            chapter_filter == chapter
+          when "TrueClass", "FalseClass"
+            chapter_filter
+          else
+            true
+          end
+          
+          volume_pass && chapter_pass
+        end
       
       rescue Exception => e
         puts "ERROR: Could not get chapter list from Manga Fox."
