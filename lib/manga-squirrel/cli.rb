@@ -10,7 +10,7 @@ module Manga
       method_option :volumes, :default => "true"
       method_option :chapters, :default => "true"
       def queue(series)
-        Manga::Squirrel::Downloader.queue series, options
+        Manga::Squirrel::Downloader.queue series.downcase.gsub(/[^a-z0-9]/,"_"), options
       end
   
       desc 'worker', 'Starts a manga-squirrel worker.'
