@@ -44,6 +44,14 @@ module Manga
           puts "Rebuilt #{chapter}\n"
         }
       end
+
+      desc 'update', 'Tries to update every series in the current folder'
+      def update
+        Dir.glob("*").each {
+          |series|
+          self.queue series
+        }
+      end
     end
   end
 end
