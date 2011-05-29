@@ -45,12 +45,14 @@ module Manga
         }
       end
 
-      desc 'update', 'Tries to update every series in the current folder'
+      desc 'update [ --volumes=filter ] [ --chapters=filter ]', 'Tries to update every series in the current folder'
+      method_option :volumes, :default => "true"
+      method_option :chapters, :default => "true"
       def update
         Dir.glob("*").each {
           |series|
           begin
-            self.queue series
+            self.queue series options
           rescue
             puts "ERROR: Failed to update #{series}"
           end
