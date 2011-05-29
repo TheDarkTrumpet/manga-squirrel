@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'thor'
 require 'resque'
 require 'manga-squirrel/downloader'
