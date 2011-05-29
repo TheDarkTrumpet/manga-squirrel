@@ -12,6 +12,12 @@ module Manga
       def self.queue(series, options = {})
         chapters(series, options).each do |chapter_url|
           chapter = chapter(series, chapter_url)
+
+		  path = Worker.gendir(chapter[:series], chapter[:volume], chapter[:chapter], chapter[:caption])
+		  if File.directory?(path) or File.exists?(path+".cbz")  then
+            puts "SKIPPING: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
+            return
+		  end
       
           puts "QUEUE: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
       
@@ -20,7 +26,7 @@ module Manga
         
             Resque.enqueue(
               Manga::Squirrel::Worker,
-              chapter[:series], chapter[:volume], chapter[:chapter], chapter[:caption], page, page_url
+              chapter[:series], chapter[:volume], chapter[:chapter], chapter[:caption], page, page_url, chapter[:pages]
             )
           end
         end
