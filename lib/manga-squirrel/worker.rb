@@ -22,16 +22,26 @@ module Manga
 
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
 		if page == pages then
-          while 1
-            Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
-              |zipfile|
-              Dir.glob(File.join(dir, "*")) { 
-                |file|
-                zipfile.add(File.basename(file, File.extname(file)),file)
-              }
-            }
+          while Dir.glob(File.join(dir, "*").count) < pages
+            sleep 1
+            puts "Worker paused - not all content downloaded to #{series} #{volume} #{chapter}\n"
           end
+          self.makecbz(dir)
         end
+      end
+
+      def self.makecbz(dir)
+        if File.exists?(dir+".cbz") then
+          File.delete(dir+".cbz")
+        end
+
+        Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
+          |zipfile|
+          Dir.glob(File.join(dir, "*")) { 
+            |file|
+            zipfile.add(File.basename(file),file)
+          }
+        }
       end
     end
   end

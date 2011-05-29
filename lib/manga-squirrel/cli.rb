@@ -35,6 +35,15 @@ module Manga
 
         threads.each { |thread| thread.join }    
       end
+
+      desc 'rebuildcbz series', 'Rebuilds all CBZs for the specified series name'
+      def rebuildcbz(series)
+        Dir.glob(File.join(series,"*")).each {
+          |chapter|
+          Manga::Squirrel::Worker.makecbz(chapter)
+          puts "Rebuilt #{chapter}\n"
+        }
+      end
     end
   end
 end
