@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
   s.add_dependency "nokogiri"
   s.add_dependency "resque"
   s.add_dependency "thor"
+  s.add_dependency "rubyzip"
 end

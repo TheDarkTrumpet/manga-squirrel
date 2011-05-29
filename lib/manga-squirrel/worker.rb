@@ -1,6 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
 require 'fileutils'
+require 'zip/zip'
 
 module Manga
   module Squirrel
@@ -21,7 +22,15 @@ module Manga
 
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
 		if page == pages then
-          system 'zip', "-r", dir+".cbz", dir
+          while 1
+            Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
+              |zipfile|
+              Dir.glob(File.join(dir, "*")) { 
+                |file|
+                zipfile.add(File.basename(file, File.extname(file)),file)
+              }
+            }
+          end
         end
       end
     end
