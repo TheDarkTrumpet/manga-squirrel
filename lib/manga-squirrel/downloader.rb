@@ -16,7 +16,7 @@ module Manga
 		  path = Worker.gendir(chapter[:series], chapter[:volume], chapter[:chapter], chapter[:caption])
 		  if File.directory?(path) or File.exists?(path+".cbz")  then
             puts "SKIPPING: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
-            return
+            next
 		  end
       
           puts "QUEUE: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."

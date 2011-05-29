@@ -49,7 +49,11 @@ module Manga
       def update
         Dir.glob("*").each {
           |series|
-          self.queue series
+          begin
+            self.queue series
+          rescue
+            puts "ERROR: Failed to update #{series}"
+          end
         }
       end
     end
