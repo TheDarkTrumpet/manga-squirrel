@@ -23,12 +23,12 @@ module Manga
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
       end
 
-      def self.makecbz(dir)
-        if File.exists?(dir+".cbz") then
-          File.delete(dir+".cbz")
+      def self.makecbz(dir,out)
+        if File.exists?(File.join(out, dir+".cbz")) then
+          File.delete(File.join(out, dir+".cbz"))
         end
 
-        Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
+        Zip::ZipFile.open(File.join(out, dir+".cbz"), Zip::ZipFile::CREATE) { 
           |zipfile|
           Dir.glob(File.join(dir, "*")).sort.each { 
             |file|

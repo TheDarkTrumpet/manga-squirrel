@@ -36,11 +36,12 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'buildcbz series', 'Builds CBZs for all chapters for the specified series name'
+      desc 'buildcbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
+      method_option :out, :default => "."
       def buildcbz(series)
         Dir.glob(File.join(series,"*")).each {
           |chapter|
-          Manga::Squirrel::Worker.makecbz(chapter)
+          Manga::Squirrel::Worker.makecbz(chapter,options[:out])
           puts "Built #{chapter}\n"
         }
       end
