@@ -21,13 +21,6 @@ module Manga
         FileUtils.mkdir_p dir = self.gendir(series, volume, chapter, caption)
 
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
-		if page == pages then
-          while Dir.glob(File.join(dir, "*").count) < pages
-            sleep 1
-            puts "Worker paused - not all content downloaded to #{series} #{volume} #{chapter}\n"
-          end
-          self.makecbz(dir)
-        end
       end
 
       def self.makecbz(dir)
@@ -37,7 +30,7 @@ module Manga
 
         Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
           |zipfile|
-          Dir.glob(File.join(dir, "*")) { 
+          Dir.glob(File.join(dir, "*")).sort.each { 
             |file|
             zipfile.add(File.basename(file),file)
           }

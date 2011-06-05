@@ -10,6 +10,7 @@ module Manga
       BASE_URL = "http://www.mangafox.com"
       
       def self.queue(series, options = {})
+        puts "Queueing: #{series}"
         chapters(series, options).each do |chapter_url|
           chapter = chapter(series, chapter_url)
 

@@ -10,7 +10,7 @@ module Manga
       method_option :volumes, :default => "true"
       method_option :chapters, :default => "true"
       def queue(series)
-        Manga::Squirrel::Downloader.queue series.downcase.gsub(/[^a-z0-9]/,"_"), options
+        self.makequeue series, options
       end
   
       desc 'worker', 'Starts a manga-squirrel worker.'
@@ -36,27 +36,40 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'rebuildcbz series', 'Rebuilds all CBZs for the specified series name'
-      def rebuildcbz(series)
+      desc 'buildcbz series', 'Builds CBZs for all chapters for the specified series name'
+      def buildcbz(series)
         Dir.glob(File.join(series,"*")).each {
           |chapter|
           Manga::Squirrel::Worker.makecbz(chapter)
-          puts "Rebuilt #{chapter}\n"
+          puts "Built #{chapter}\n"
         }
       end
 
-      desc 'update [ --volumes=filter ] [ --chapters=filter ]', 'Tries to update every series in the current folder'
-      method_option :volumes, :default => "true"
-      method_option :chapters, :default => "true"
-      def update
-        Dir.glob("*").each {
-          |series|
+      desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filenaem, skipping any chapters already existing'
+method_option :file, :default => ".ms"
+      def fetch
+        begin
+          f = File.open(options[:file], 'r')
+        rescue
+          puts "ERROR: File #{options[:file]} not found"
+          return
+        end
+        f.readlines.each {
+          |name|
+          puts "Fetching #{name}"
           begin
-            self.queue series options
+            self.makequeue name.strip, {:volumes=>"true",:chapters=>"true"}
           rescue
-            puts "ERROR: Failed to update #{series}"
+            puts "ERROR: Failed to fetch #{name}"
           end
         }
+        f.close
+      end
+
+      no_tasks do
+        def makequeue(series, options)
+            Manga::Squirrel::Downloader.queue series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_"), options
+        end
       end
     end
   end
