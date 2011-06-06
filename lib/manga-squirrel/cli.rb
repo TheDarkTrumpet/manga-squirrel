@@ -1,18 +1,12 @@
 require 'rubygems'
 require 'thor'
 require 'resque'
-require 'manga-squirrel/downloader'
+require 'manga-squirrel/common'
+require 'manga-squirrel/queuer'
 
 module Manga
   module Squirrel
     class CLI < Thor
-      desc 'queue series [ --volumes=filter ] [ --chapters=filter ]', 'Queue the specified manga for download.'
-      method_option :volumes, :default => "true"
-      method_option :chapters, :default => "true"
-      def queue(series)
-        self.makequeue series, options
-      end
-  
       desc 'worker', 'Starts a manga-squirrel worker.'
       def worker
         worker = Resque::Worker.new('manga-squirrel')
@@ -36,18 +30,15 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'buildcbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
+      desc 'cbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
       method_option :out, :default => "."
       def buildcbz(series)
-        Dir.glob(File.join(series,"*")).each {
-          |chapter|
-          Manga::Squirrel::Worker.makecbz(chapter,options[:out])
-          puts "Built #{chapter}\n"
-        }
+        self.makequeue QueueAction::Archive, {:series=>series.strip, :optiens=>options}
       end
 
       desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filenaem, skipping any chapters already existing'
-method_option :file, :default => ".ms"
+      method_option :file, :default => ".ms"
+      method_option :site, :default => "MangaFox"
       def fetch
         begin
           f = File.open(options[:file], 'r')
@@ -59,7 +50,7 @@ method_option :file, :default => ".ms"
           |name|
           puts "Fetching #{name}"
           begin
-            self.makequeue name.strip, {:volumes=>"true",:chapters=>"true"}
+            self.makequeue 
           rescue
             puts "ERROR: Failed to fetch #{name}"
           end
@@ -68,8 +59,8 @@ method_option :file, :default => ".ms"
       end
 
       no_tasks do
-        def makequeue(series, options)
-            Manga::Squirrel::Downloader.queue series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_"), options
+        def makequeue(action, options)
+            Manga::Squirrel::Downloader.queue action, {:series=>series, :options=>options}
         end
       end
     end
