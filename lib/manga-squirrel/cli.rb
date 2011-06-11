@@ -39,6 +39,10 @@ module Manga
       desc 'buildcbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
       method_option :out, :default => "."
       def buildcbz(series)
+		if not File.directory?(File.join(options[:out], series)) then
+		  Dir.mkdir(File.join(options[:out], series))
+		end
+
         Dir.glob(File.join(series,"*")).each {
           |chapter|
           Manga::Squirrel::Worker.makecbz(chapter,options[:out])
