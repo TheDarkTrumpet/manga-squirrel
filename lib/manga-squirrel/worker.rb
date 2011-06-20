@@ -7,9 +7,13 @@ module Manga
   module Squirrel
     class Worker
       @queue  = 'manga-squirrel'
+	
+      def self.namesanitize(name)
+        name.gsub(/[\\\?%*|"<>]/, '')
+      end
 
       def self.gendir(series, volume, chapter, caption)
-        return File.join(series, "#{[volume, chapter].compact.join('-')} #{caption}")
+        return File.join(series, "#{[volume, chapter].compact.join('-')} #{self.namesanitize caption}")
       end
 
       def self.perform(series, volume, chapter, caption, page, url, pages)

@@ -71,6 +71,20 @@ method_option :file, :default => ".ms"
         f.close
       end
 
+      desc 'rename series', '**For upgrading between MS versions. Sanitizes all chapter names'
+      def rename(series)
+        Dir.glob(File.join(series,"*")).each {
+          |chapter|
+          if File.directory?(chapter) then
+            new_name = Manga::Squirrel::Worker::namesanitize(chapter)
+			unless new_name == chapter then
+              puts "Renamed #{chapter} to #{new_name}"
+              File.rename(chapter,new_name)
+			end
+          end
+        }
+      end
+
       no_tasks do
         def makequeue(series, options)
             Manga::Squirrel::Downloader.queue series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_"), options
