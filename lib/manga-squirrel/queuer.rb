@@ -19,10 +19,12 @@ module Manga
       def self.queueDownload(site, series, options)        
         series = series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
 
-        chapters = case site
-                   when Site::MangaFox
-                     Manga::Squirrel::MangaFox::getChapters(series, options)
-                   end
+        chapters = site::getChapters(series, options)
+
+        if chapters.nil? then
+          puts "ERROR: no chapters retrieved"
+          return
+        end
 
         chapters.each {
           |chapter|
@@ -38,10 +40,7 @@ module Manga
 
           1.upto(chapter[:pages]) {
             |page|
-            page_url = case site
-                       when Site::MangaFox
-                         Manga::Squirrel::MangaFox::getPageURL(chapter, pag)
-                       end
+            page_url = site::getPageURL(chapter, pag)
 
             Resque.enqueue(
               Manga::Squirrel::Worker,

@@ -10,7 +10,8 @@ module Manga
         chapters = Array.new
         self.parseChapters(series, options).each {
           |chapter_url|
-          chapters.pushself.parseChapter(series, chapter_url)
+          chapters.push self.parseChapter(series, chapter_url)
+          puts "add chapter #{chapter_url}"
         }
 
         chapters
@@ -22,11 +23,12 @@ module Manga
 
       private
       def self.parseChapters(series, options)
+        puts "looking for #{series}. #{options.inspect}"
         url = "#{BASE_URL}/manga/#{series}"
     
         doc = Nokogiri::HTML(open(url))
 
-        list = doc.css("table#listing td a.ch").collect { |node| Manga::Squirrel::Downloader::BASE_URL + node.attribute('href').value }
+        list = doc.css("table#listing td a.ch").collect { |node| Manga::Squirrel::MangaFox::BASE_URL + node.attribute('href').value }
         list.reverse!
         list.select do |url|
           url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/

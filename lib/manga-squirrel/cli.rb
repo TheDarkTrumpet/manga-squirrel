@@ -36,9 +36,11 @@ module Manga
         self.makequeue QueueAction::Archive, {:series=>series.strip, :optiens=>options}
       end
 
-      desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filenaem, skipping any chapters already existing'
+      desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filename, skipping any chapters already existing'
       method_option :file, :default => ".ms"
       method_option :site, :default => "MangaFox"
+	  method_option :volumes, :default => "true"
+	  method_option :chapters, :default => "true"
       def fetch
         begin
           f = File.open(options[:file], 'r')
@@ -47,12 +49,15 @@ module Manga
           return
         end
         f.readlines.each {
-          |name|
-          puts "Fetching #{name}"
+          |line|
+		  splits = line.strip.split('	')
+		  name = splits[0]
+		  site = ("Manga::Squirrel::"+splits[1]).to_class
+          puts "Fetching #{name} at #{site.inspect}"
           begin
-            self.makequeue 
-          rescue
-            puts "ERROR: Failed to fetch #{name}"
+            self.makequeue QueueAction::Download, {:site=>site,:series=>name,:options=>options}
+          #rescue
+          #  puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
         }
         f.close
@@ -74,7 +79,7 @@ module Manga
 
       no_tasks do
         def makequeue(action, options)
-            Manga::Squirrel::Downloader.queue action, {:series=>series, :options=>options}
+            Manga::Squirrel::Queuer.queue action, options
         end
       end
     end
