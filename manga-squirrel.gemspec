@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "manga-squirrel"
   s.version     = Manga::Squirrel::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Erol Fornoles"]
-  s.email       = ["erol.fornoles@gmail.com"]
+  s.authors     = ["Erol Fornoles","Ali Lown"]
+  s.email       = ["erol.fornoles@gmail.com","ali@lown.me.uk"]
   s.homepage    = "http://rubygems.org/gems/manga-squirrel"
   s.summary     = %q{Manga Squirrel: Manga Fox Mass Downloader}
   s.description = %q{Manga Squirrel is a background multi-threaded mass downloader for the site Manga Fox using Ruby + Redis + Resque.}
