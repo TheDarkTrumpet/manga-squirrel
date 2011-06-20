@@ -9,7 +9,7 @@ module Manga
       @queue  = 'manga-squirrel'
 	
       def self.namesanitize(name)
-        name.gsub(/[\\\?%*|"<>]/, '')
+        name.gsub(/[\\\?%*:|"<>]/, '')
       end
 
       def self.gendir(series, volume, chapter, caption)
