@@ -8,6 +8,10 @@ module Manga
   module Squirrel
     class Worker
       @queue  = 'manga-squirrel'
+	
+      def self.namesanitize(name)
+        name.gsub(/[\\\?%*|"<>]/, '')
+      end
 
       def self.perform(action, options)
         case action
@@ -16,7 +20,6 @@ module Manga
         when QueueAction::Archive
           self.doArchive options[:chapter], options[:outdir]
         end
-      end
 
       def self.doDownload(chapter, page, url)
         doc = Nokogiri::HTML(open(url))

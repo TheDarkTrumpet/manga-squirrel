@@ -11,8 +11,12 @@ module Manga
       MangaFox = 0
     end
 
+    def namesanitize(name)
+      name.gsub(/[\\\?%*|"<>]/, '')
+    end
+
     def gendir(chapter)
-      File.join(chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{chapter[:caption]}")
+      File.join(chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
     end
   end
 end
