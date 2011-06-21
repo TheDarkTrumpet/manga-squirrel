@@ -7,9 +7,6 @@ module Manga
       Download = 0
       Archive = 1
     end
-    module Site
-      MangaFox = 0
-    end
 
     def namesanitize(name)
       name.gsub(/[\\\?%*:|"<>]/, '')
