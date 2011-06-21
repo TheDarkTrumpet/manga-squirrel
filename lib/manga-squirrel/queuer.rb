@@ -28,7 +28,7 @@ module Manga
 
         chapters.each {
           |chapter|
-          path = Manga::Squirrel::Worker.gendir(chapter) 
+          path = gendir(chapter) 
           if File.directory? path then
             if Dir.glob(File.join(path,"*")).count = chapter[:pages] then
               puts "SKIPPING: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
