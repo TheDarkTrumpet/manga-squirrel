@@ -5,14 +5,22 @@ module Manga
   module Squirrel
     class Manga::Squirrel::MangaFox
       BASE_URL = "http://www.mangafox.com"
+	  @@chapterlist = {}
 
       def self.getChapters(series, options)
+
+        if @@chapterlist.include?(series) then
+          return @@chapterlist[series]
+        end
+
         chapters = Array.new
         self.parseChapters(series, options).each {
           |chapter_url|
           chapters.push self.parseChapter(series, chapter_url)
           puts "add chapter #{chapter_url}"
         }
+
+        @@chapterlist[series] = chapters
 
         chapters
       end
