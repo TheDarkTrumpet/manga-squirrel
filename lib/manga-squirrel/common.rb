@@ -12,7 +12,7 @@ module Manga
     end
 
     def namesanitize(name)
-      name.gsub(/[\\\?%*|"<>]/, '')
+      name.gsub(/[\\\?%*:|"<>]/, '')
     end
 
     def gendir(chapter)
