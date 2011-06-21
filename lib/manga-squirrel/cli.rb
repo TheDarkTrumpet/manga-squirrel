@@ -76,7 +76,7 @@ module Manga
         Dir.glob(File.join(series,"*")).each {
           |chapter|
           if File.directory?(chapter) then
-            new_name = Manga::Squirrel::Worker::namesanitize(chapter)
+            new_name = namesanitize(chapter)
 			unless new_name == chapter then
               puts "Renamed #{chapter} to #{new_name}"
               File.rename(chapter,new_name)

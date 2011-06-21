@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'resque'
 require 'manga-squirrel/common'
+require 'manga-squirrel/worker'
 
 module Manga
   module Squirrel
@@ -30,7 +31,7 @@ module Manga
           |chapter|
           path = gendir(chapter) 
           if File.directory? path then
-            if Dir.glob(File.join(path,"*")).count = chapter[:pages] then
+            if Dir.glob(File.join(path,"*")).count == chapter[:pages] then
               puts "SKIPPING: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
               next
             end
@@ -40,7 +41,7 @@ module Manga
 
           1.upto(chapter[:pages]) {
             |page|
-            page_url = site::getPageURL(chapter, pag)
+            page_url = site::getPageURL(chapter, page)
 
             Resque.enqueue(
               Manga::Squirrel::Worker,

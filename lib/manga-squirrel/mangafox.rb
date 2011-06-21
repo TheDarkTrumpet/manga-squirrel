@@ -26,7 +26,7 @@ module Manga
       end
 
       def self.getPageURL(chapter, page)
-        chapter_url.gsub /(.*\/)(\d+)(.html)$/, "\\1#{page}\\3"
+        chapter[:url].gsub /(.*\/)(\d+)(.html)$/, "\\1#{page}\\3"
       end
 
       private
@@ -36,7 +36,7 @@ module Manga
     
         doc = Nokogiri::HTML(open(url))
 
-        list = doc.css("table#listing td a.ch").collect { |node| Manga::Squirrel::MangaFox::BASE_URL + node.attribute('href').value }
+        list = doc.css("table#listing td a.ch").collect { |node| BASE_URL + node.attribute('href').value }
         list.reverse!
         list.select do |url|
           url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/

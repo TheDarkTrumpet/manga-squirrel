@@ -7,15 +7,15 @@ module Manga
       Download = 0
       Archive = 1
     end
-
-    def namesanitize(name)
-      name.gsub(/[\\\?%*:|"<>]/, '')
-    end
-
-    def gendir(chapter)
-      File.join(chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
-    end
   end
+end
+
+def namesanitize(name)
+  name.gsub(/[\\\?%*:|"<>]/, '')
+end
+
+def gendir(chapter)
+  File.join(chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
 end
 
 class String

@@ -6,7 +6,7 @@ require 'manga-squirrel/common'
 
 module Manga
   module Squirrel
-    class Worker
+    class Manga::Squirrel::Worker
       @queue  = 'manga-squirrel'
 
       def self.perform(action, options)
@@ -16,6 +16,7 @@ module Manga
         when QueueAction::Archive
           self.doArchive options[:chapter], options[:outdir]
         end
+      end
 
       def self.doDownload(chapter, page, url)
         doc = Nokogiri::HTML(open(url))
