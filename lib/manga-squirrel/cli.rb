@@ -36,9 +36,17 @@ module Manga
         self.makequeue QueueAction::Archive, {:series=>series.strip, :optiens=>options}
       end
 
-      desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filename, skipping any chapters already existing'
-      method_option :file, :default => ".ms"
+      desc 'queue series [--site=class --volumes=filter --chapters=filter]', 'Tries to fetch all chapters for given manga, skipping existing'
       method_option :site, :default => "MangaFox"
+	  method_option :volumes, :default => "true"
+	  method_option :chapters, :default => "true"
+      def queue(series)
+        site = ("Manga::Squirrel::"+options[:site]).to_class
+        self.makequeue QueueAction::Download, {:site=>site,:series=>series,:options=>options}
+      end
+
+      desc 'fetch [--file=name --volumes=filter --chapters=filter]', 'Tries to fetch all mangas listed in filename, skipping any chapters already existing'
+      method_option :file, :default => ".ms"
 	  method_option :volumes, :default => "true"
 	  method_option :chapters, :default => "true"
       def fetch
