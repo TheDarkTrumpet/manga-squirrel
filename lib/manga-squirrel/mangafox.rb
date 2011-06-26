@@ -17,7 +17,6 @@ module Manga
         self.parseChapters(series, options).each {
           |chapter_url|
           chapters.push self.parseChapter(series, chapter_url)
-          puts "add chapter #{chapter_url}"
         }
 
         @@chapterlist[series] = chapters
@@ -31,7 +30,6 @@ module Manga
 
       private
       def self.parseChapters(series, options)
-        puts "looking for #{series}. #{options.inspect}"
         url = "#{BASE_URL}/manga/#{series}"
     
         doc = Nokogiri::HTML(open(url))

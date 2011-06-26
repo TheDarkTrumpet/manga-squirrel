@@ -23,4 +23,5 @@ Gem::Specification.new do |s|
   s.add_dependency "resque"
   s.add_dependency "thor"
   s.add_dependency "rubyzip"
+  s.add_dependency "progressbar"
 end

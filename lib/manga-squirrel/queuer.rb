@@ -1,5 +1,7 @@
+require 'rubygems'
 require 'fileutils'
 require 'resque'
+require 'progressbar'
 require 'manga-squirrel/common'
 require 'manga-squirrel/worker'
 
@@ -27,17 +29,16 @@ module Manga
           return
         end
 
+        pbar = ProgressBar.new(series, chapters.count)
         chapters.each {
           |chapter|
           path = gendir(chapter) 
           if File.directory? path then
             if Dir.glob(File.join(path,"*")).count == chapter[:pages] then
-              puts "SKIPPING: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
               next
             end
           end
 
-          puts "QUEUE: #{chapter[:series]} " + (chapter[:volume] ? "volume #{chapter[:volume]} " : "") + "chapter #{chapter[:chapter]} pages 1-#{chapter[:pages]}..."
 
           1.upto(chapter[:pages]) {
             |page|
@@ -48,7 +49,9 @@ module Manga
               QueueAction::Download, {:chapter=>chapter, :page=>page, :url=>page_url}
             )
           }
+          pbar.inc
         }
+        pbar.finish
       end
 
       def self.queueArchive(series, options)
