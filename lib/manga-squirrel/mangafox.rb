@@ -83,7 +83,7 @@ module Manga
       end
 
       def self.parseURL(url)
-          url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
+          url =~ /http:\/\/.*?\/manga\/.*?(\/v([X0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
           return $2.to_f, $3.to_f
       end
 
@@ -93,7 +93,7 @@ module Manga
         doc = Nokogiri::HTML(open(url))
     
         title = doc.css("meta[property='og:title']").attribute('content').value
-        title =~ /(.*?) Manga (Vol\.(\d+) )?Ch\.([0-9\.]+):? ?(.*)$/
+        title =~ /(.*?) Manga (Vol\.([X0-9]+) )?Ch\.([0-9\.]+):? ?(.*)$/
 
         chapter[:series] = $1
         chapter[:volume] = $3
