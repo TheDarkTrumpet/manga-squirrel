@@ -21,11 +21,14 @@ module Manga
       def self.queueDownload(site, series, options)        
         seriesSan = series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
 
-        path = gendir({:series=>series, :volume=>"*", :chapter=>"*", :caption=>"*"});
         existingChapters = Array.new
-        Dir.glob(path).each {
+        Dir.glob(File.join(series,"*")).each {
           |chapter|
-          existingChapters.push chapter.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)[3].to_f
+          try = chapter.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)[3]
+          if try.nil? then
+            try = chapter.split(/(.*)\/([0-9.]+) (.*)/)[2]
+          end
+          existingChapters.push try.to_f
         }
         
         chapters = site::getChapters(seriesSan, options, existingChapters)
