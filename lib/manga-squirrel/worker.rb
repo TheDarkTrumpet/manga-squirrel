@@ -32,15 +32,19 @@ module Manga
       end
 
       def self.doArchive(chapter, out)
-        dir = gendir(chapter)
+        dir = File.join(out, chapter)
 
-        if File.exists?(File.join(out, dir+".cbz")) then
-          File.delete(File.join(out, dir+".cbz"))
+        if not File.directory?(File.join(out,File.dirname(chapter))) then
+          FileUtils.mkdir_p File.join(out,File.dirname(chapter))
         end
 
-        Zip::ZipFile.open(File.join(out, dir+".cbz"), Zip::ZipFile::CREATE) { 
+        if File.exists?(dir+".cbz") then
+          File.delete(dir+".cbz")
+        end
+
+        Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
           |zipfile|
-          Dir.glob(File.join(dir, "*")).sort.each { 
+          Dir.glob(File.join(chapter, "*")).sort.each { 
             |file|
             zipfile.add(File.basename(file),file)
           }
