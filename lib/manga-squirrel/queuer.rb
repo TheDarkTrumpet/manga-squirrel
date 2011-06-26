@@ -19,9 +19,16 @@ module Manga
       private
 
       def self.queueDownload(site, series, options)        
-        series = series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
+        seriesSan = series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
 
-        chapters = site::getChapters(series, options)
+        path = gendir({:series=>series, :volume=>"*", :chapter=>"*", :caption=>"*"});
+        existingChapters = Array.new
+        Dir.glob(path).each {
+          |chapter|
+          existingChapters.push chapter.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)[3].to_f
+        }
+        
+        chapters = site::getChapters(seriesSan, options, existingChapters)
 
         if chapters.nil? then
           puts "ERROR: no chapters retrieved"
@@ -31,12 +38,6 @@ module Manga
         chapters.each {
           |chapter|
           path = gendir(chapter) 
-          if File.directory? path then
-            if Dir.glob(File.join(path,"*")).count == chapter[:pages] then
-              next
-            end
-          end
-
 
           1.upto(chapter[:pages]) {
             |page|

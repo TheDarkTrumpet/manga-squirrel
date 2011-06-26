@@ -10,7 +10,7 @@ module Manga
       BASE_URL = "http://www.mangafox.com"
 	  @@chapterlist = {}
 
-      def self.getChapters(series, options)
+      def self.getChapters(series, options, existingChapters)
 
         if @@chapterlist.include?(series) then
           return @@chapterlist[series]
@@ -23,6 +23,10 @@ module Manga
         tmp.peach {
           |chapter_url|
           pbar.inc
+          volume, chapter = self.parseURL(chapter_url)
+          if existingChapters.include?(chapter) then
+            next
+          end
           chapters.push self.parseChapter(series, chapter_url)
         }
         pbar.finish
@@ -45,10 +49,8 @@ module Manga
         list = doc.css("table#listing td a.ch").collect { |node| BASE_URL + node.attribute('href').value }
         list.reverse!
         list.select do |url|
-          url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
-          volume = $2.to_f
-          chapter = $3.to_f
-          
+          volume, chapter = self.parseURL(url)
+
           volume_filter = eval(options[:volumes])
           volume_pass = case volume_filter.class.name
                         when "Array", "Range"
@@ -78,6 +80,11 @@ module Manga
 
       rescue Exception => e
         puts "ERROR: Could not get chapter list from Manga Fox."
+      end
+
+      def self.parseURL(url)
+          url =~ /http:\/\/.*?\/manga\/.*?(\/v([0-9\.]+))?\/c([0-9\.]+)\/\d+\.html/
+          return $2.to_f, $3.to_f
       end
 
       def self.parseChapter(series, url)
