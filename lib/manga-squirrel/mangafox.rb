@@ -1,5 +1,7 @@
+require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
+require 'peach'
 
 module Manga
   module Squirrel
@@ -14,7 +16,7 @@ module Manga
         end
 
         chapters = Array.new
-        self.parseChapters(series, options).each {
+        self.parseChapters(series, options).peach {
           |chapter_url|
           chapters.push self.parseChapter(series, chapter_url)
         }
