@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'fileutils'
 require 'resque'
-require 'progressbar'
 require 'manga-squirrel/common'
 require 'manga-squirrel/worker'
 
@@ -29,7 +28,6 @@ module Manga
           return
         end
 
-        pbar = ProgressBar.new(series, chapters.count)
         chapters.each {
           |chapter|
           path = gendir(chapter) 
@@ -49,9 +47,7 @@ module Manga
               QueueAction::Download, {:chapter=>chapter, :page=>page, :url=>page_url}
             )
           }
-          pbar.inc
         }
-        pbar.finish
       end
 
       def self.queueArchive(series, options)

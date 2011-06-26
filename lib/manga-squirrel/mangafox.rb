@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
+require 'progressbar'
 require 'peach'
 
 module Manga
@@ -16,10 +17,15 @@ module Manga
         end
 
         chapters = Array.new
-        self.parseChapters(series, options).peach {
+
+        tmp = self.parseChapters(series, options)
+        pbar = ProgressBar.new(series, tmp.count)
+        tmp.peach {
           |chapter_url|
+          pbar.inc
           chapters.push self.parseChapter(series, chapter_url)
         }
+        pbar.finish
 
         @@chapterlist[series] = chapters
 
