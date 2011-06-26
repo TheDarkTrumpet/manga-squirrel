@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
 require 'fileutils'
@@ -10,6 +11,7 @@ module Manga
       @queue  = 'manga-squirrel'
 
       def self.perform(action, options)
+        options = Hash.transform_keys_to_symbols(options)
         case action
         when QueueAction::Download
           self.doDownload options[:chapter], options[:page], options[:url]
@@ -24,7 +26,7 @@ module Manga
         img = doc.css('#image').attribute('src').value
         ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
-        FileUtils.mkdir_p dir = self.gendir(chapter)
+        FileUtils.mkdir_p dir = gendir(chapter)
 
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
       end

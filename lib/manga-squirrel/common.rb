@@ -30,3 +30,11 @@ class String
     nil
   end
 end
+
+class Hash
+  def self.transform_keys_to_symbols(value)
+    return value if not value.is_a?(Hash)
+    hash = value.inject({}){|memo,(k,v)| memo[k.to_sym] = Hash.transform_keys_to_symbols(v); memo}
+    return hash
+  end
+end
