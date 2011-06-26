@@ -32,7 +32,7 @@ module Manga
 
       desc 'cbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
       method_option :out, :default => "."
-      def buildcbz(series)
+      def cbz(series)
         self.makequeue QueueAction::Archive, {:series=>series.strip, :optiens=>options}
       end
 
