@@ -15,7 +15,7 @@ def namesanitize(name)
 end
 
 def gendir(chapter)
-  File.join(chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
+  File.join(chapter[:root], chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
 end
 
 class String
