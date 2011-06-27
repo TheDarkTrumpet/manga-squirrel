@@ -40,6 +40,10 @@ module Manga
         chapter[:url].gsub /(.*\/)(\d+)(.html)$/, "\\1#{page}\\3"
       end
 
+      def self.urlify(series)
+        series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
+      end
+
       private
       def self.parseChapters(series, options)
         url = "#{BASE_URL}/manga/#{series}"

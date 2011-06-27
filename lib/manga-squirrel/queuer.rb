@@ -19,7 +19,7 @@ module Manga
       private
 
       def self.queueDownload(site, series, options)        
-        seriesSan = series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
+        seriesSan = site::urlify(series)
 
         existingChapters = Array.new
         Dir.glob(File.join(series,"*")).each {
