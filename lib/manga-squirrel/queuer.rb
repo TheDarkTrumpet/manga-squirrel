@@ -40,12 +40,15 @@ module Manga
 
         chapters.each {
           |chapter|
+          
+          chapter[:root] = File.expand_path(".")
           path = gendir(chapter) 
 
           1.upto(chapter[:pages]) {
             |page|
             page_url = site::getPageURL(chapter, page)
 
+            
             Resque.enqueue(
               Manga::Squirrel::Worker,
               QueueAction::Download, {:chapter=>chapter, :page=>page, :url=>page_url}
@@ -62,7 +65,7 @@ module Manga
 
           Resque.enqueue(
             Manga::Squirrel::Worker,
-            QueueAction::Archive, {:chapter=>chapter, :outdir=>options[:out]}
+            QueueAction::Archive, {:root=>File.expand_path("."), :chapter=>chapter, :outdir=>options[:out]}
           )
         }
       end

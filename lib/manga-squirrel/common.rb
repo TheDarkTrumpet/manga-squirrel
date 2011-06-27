@@ -10,12 +10,8 @@ module Manga
   end
 end
 
-def namesanitize(name)
-  name.gsub(/[\\\?%:|"<>]/, '')
-end
-
-def gendir(chapter,root=nil)
-  File.join(root, chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
+def gendir(chapter)
+  File.join(chapter[:root], chapter[:series].sanitize, "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{chapter[:caption].sanitize}")
 end
 
 class String
@@ -28,6 +24,10 @@ class String
     klass.is_a?(Class) ? klass : nil
   rescue NameError
     nil
+  end
+
+  def sanitize
+    self.gsub(/[\\\?%:|"<>]/, '')
   end
 end
 
