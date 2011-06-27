@@ -33,7 +33,7 @@ module Manga
       desc 'cbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
       method_option :out, :default => "."
       def cbz(series)
-        self.makequeue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.absolute_path(options[:out])}}
+        self.makequeue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out])}}
       end
 
       desc 'queue series [--site=class --volumes=filter --chapters=filter]', 'Tries to fetch all chapters for given manga, skipping existing'
