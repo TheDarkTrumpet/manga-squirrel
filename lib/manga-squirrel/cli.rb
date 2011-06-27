@@ -71,7 +71,8 @@ module Manga
         f.close
       end
 
-      desc 'rename series', '**For upgrading between MS versions. Sanitizes all chapter names'
+      desc 'rename [--perform=true] series', '**For upgrading between MS versions. Sanitizes all chapter names'
+      method_option :perform, :default => "false"
       def rename(series)
         Dir.glob(File.join(series,"*")).each {
           |chapter|
@@ -79,7 +80,9 @@ module Manga
             new_name = namesanitize(chapter)
 			unless new_name == chapter then
               puts "Renamed #{chapter} to #{new_name}"
-              File.rename(chapter,new_name)
+              if eval(options[:perform]) then
+                File.rename(chapter,new_name)
+              end 
 			end
           end
         }
