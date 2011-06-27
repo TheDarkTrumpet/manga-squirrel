@@ -14,7 +14,7 @@ def namesanitize(name)
   name.gsub(/[\\\?%:|"<>]/, '')
 end
 
-def gendir(chapter,root)
+def gendir(chapter,root=nil)
   File.join(root, chapter[:series], "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{namesanitize(chapter[:caption])}")
 end
 
