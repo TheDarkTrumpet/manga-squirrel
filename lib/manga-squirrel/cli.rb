@@ -71,7 +71,7 @@ module Manga
         f.close
       end
 
-      desc 'rename [--perform=true] series', '**For upgrading between MS versions. Sanitizes all chapter names'
+      desc 'rename series [--perform=true]', '**For upgrading between MS versions. Sanitizes all chapter names'
       method_option :perform, :default => "false"
       def rename(series)
         Dir.glob(File.join(series,"*")).each {
