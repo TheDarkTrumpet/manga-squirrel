@@ -77,7 +77,7 @@ module Manga
         Dir.glob(File.join(series,"*")).each {
           |chapter|
           if File.directory?(chapter) then
-            new_name = namesanitize(chapter)
+            new_name = chapter.sanitize
 			unless new_name == chapter then
               puts "Renamed #{chapter} to #{new_name}"
               if eval(options[:perform]) then
