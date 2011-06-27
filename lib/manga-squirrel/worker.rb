@@ -16,7 +16,7 @@ module Manga
         when QueueAction::Download
           self.doDownload options[:chapter], options[:page], options[:url]
         when QueueAction::Archive
-          self.doArchive options[:chapter], options[:outdir]
+          self.doArchive options[:root], options[:chapter], options[:outdir]
         end
       end
 
@@ -31,7 +31,7 @@ module Manga
         system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
       end
 
-      def self.doArchive(chapter, out)
+      def self.doArchive(root, chapter, out)
         dir = File.join(out, chapter)
 
         if not File.directory?(File.join(out,File.dirname(chapter))) then
@@ -44,7 +44,7 @@ module Manga
 
         Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
           |zipfile|
-          Dir.glob(File.join(chapter, "*")).sort.each { 
+          Dir.glob(File.join(root, chapter, "*")).sort.each { 
             |file|
             zipfile.add(File.basename(file),file)
           }

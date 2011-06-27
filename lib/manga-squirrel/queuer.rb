@@ -65,7 +65,7 @@ module Manga
 
           Resque.enqueue(
             Manga::Squirrel::Worker,
-            QueueAction::Archive, {:chapter=>chapter, :outdir=>options[:out]}
+            QueueAction::Archive, {:root=>File.expand_path("."), :chapter=>chapter, :outdir=>options[:out]}
           )
         }
       end
