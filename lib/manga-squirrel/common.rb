@@ -27,7 +27,7 @@ class String
   end
 
   def sanitize
-    self.gsub(/[\\\?%:|"<>]/, '')
+    self.gsub(/[\\\?%:|"<>\*]/, '')
   end
 end
 
