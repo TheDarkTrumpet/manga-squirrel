@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'manga-squirrel/mangafox'
+require 'manga-squirrel/mangareader'
 
 module Manga
   module Squirrel
