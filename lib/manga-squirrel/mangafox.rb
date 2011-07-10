@@ -52,10 +52,13 @@ module Manga
 
         list = doc.css("table#listing td a.ch").collect { |node| BASE_URL + node.attribute('href').value }
         list.reverse!
+        
+        volume_filter = eval(options[:volumes])
+        chapter_filter = eval(options[:chapters])
+
         list.select do |url|
           volume, chapter = self.parseURL(url)
 
-          volume_filter = eval(options[:volumes])
           volume_pass = case volume_filter.class.name
                         when "Array", "Range"
                           volume_filter.include?(volume)
@@ -67,7 +70,6 @@ module Manga
                           true
                         end
           
-          chapter_filter = eval(options[:chapters])
           chapter_pass = case chapter_filter.class.name
                          when "Array", "Range"
                            chapter_filter.include?(chapter)
