@@ -8,6 +8,7 @@ module Manga
   module Squirrel
     class Manga::Squirrel::MangaFox
       BASE_URL = "http://www.mangafox.com"
+      IMG_DIV = "image"
 	  @@chapterlist = {}
 
       def self.getChapters(series, options, existingChapters)
@@ -109,6 +110,8 @@ module Manga
         chapter[:pages] = doc.css("select.middle option[selected=selected]").first.parent.children.count
     
         chapter[:url] = url
+
+        chapter[:img_div] = IMG_DIV
 
         chapter
       end

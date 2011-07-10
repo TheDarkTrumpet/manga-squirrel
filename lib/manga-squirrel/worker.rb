@@ -23,7 +23,7 @@ module Manga
       def self.doDownload(chapter, page, url)
         doc = Nokogiri::HTML(open(url))
 
-        img = doc.css('#image').attribute('src').value
+        img = doc.css(chapter[:img_div]).attribute('src').value
         ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
         FileUtils.mkdir_p dir = gendir(chapter)

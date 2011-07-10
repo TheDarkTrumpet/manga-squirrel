@@ -8,6 +8,7 @@ module Manga
   module Squirrel
     class Manga::Squirrel::MangaReader
       BASE_URL = "http://www.mangareader.net"
+      IMG_DIV = "img"
 	  @@chapterlist = {}
 
       def self.getChapters(series, options, existingChapters)
@@ -18,8 +19,7 @@ module Manga
         chapters = Array.new
         tmp = self.parseChapters(series, options)
         pbar = ProgressBar.new(series, tmp.count)
-        #Change to peach once tested
-        tmp.each {
+        tmp.peach {
           |v|
           pbar.inc
           chapter = self.getChapter(v)
@@ -36,7 +36,7 @@ module Manga
       end
 
       def self.getPageURL(chapter, page)
-        return BASE_URL + chapter[:pages_info][page]
+        return BASE_URL + chapter[:pages_info][page-1][0]
       end
 
       def self.urlify(series)
@@ -85,15 +85,17 @@ module Manga
       end
 
       def self.getChapter(v)
-        (v[0].match /\/(.*)\/([0-9]*)/)[2].to_i
+        (v[0].match /\/([0-9-]+)\/(.*)\/chapter-([0-9]+).html/)[3].to_i
       end
 
       def self.parseChapter(series, v)
         chapter = {}
 
         doc = Nokogiri::HTML(open(BASE_URL + v[0]))
+        titleDoc = doc.css("meta[name='description']").attribute('content').value
+        title = titleDoc.scan(/(.+) [0-9]+ -/)
         
-        chapter[:series] = series
+        chapter[:series] = title[0][0] 
         chapter[:volume] = nil
         chapter[:chapter] = self.getChapter(v)
         chapter[:caption] = v[2]
@@ -106,6 +108,8 @@ module Manga
         chapter[:pages_info] = pages
 
         chapter[:url] = BASE_URL + v[0]
+
+        chapter[:img_div] = IMG_DIV
 
         chapter
       end
