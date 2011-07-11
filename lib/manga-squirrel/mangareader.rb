@@ -80,12 +80,13 @@ module Manga
           chapter_pass
         end
 
-      rescue Exception => e
-       puts "ERROR: Could not get the chapter list from Manga Reader."
+      #rescue Exception => e
+      # puts "ERROR: Could not get the chapter list from MangaReader."
       end
 
       def self.getChapter(v)
-        (v[0].match /\/([0-9-]+)\/(.*)\/chapter-([0-9]+).html/)[3].to_i
+              r = v[1].split(" ")
+              r[r.length-1].to_f
       end
 
       def self.parseChapter(series, v)
