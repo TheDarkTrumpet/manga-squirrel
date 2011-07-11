@@ -86,7 +86,7 @@ module Manga
 
       def self.getChapter(v)
               r = v[1].split(" ")
-              r[r.length-1].to_f
+              r[r.length-1]
       end
 
       def self.parseChapter(series, v)
