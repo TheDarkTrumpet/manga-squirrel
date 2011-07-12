@@ -91,7 +91,7 @@ module Manga
               if num.include?(".") then
                       ret += num.split(".")[1]
               end
-              ret
+              ret.to_f
       end
 
       def self.parseChapter(series, v)
