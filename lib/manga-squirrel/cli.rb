@@ -30,10 +30,11 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'cbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
+      desc 'cbz series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'.
       method_option :out, :default => "."
+      method_option :force, :default => false
       def cbz(series)
-        self.makequeue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out])}}
+        self.makequeue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
       end
 
       desc 'queue series [--site=class --volumes=filter --chapters=filter]', 'Tries to fetch all chapters for given manga, skipping existing'
