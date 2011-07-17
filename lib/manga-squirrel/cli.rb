@@ -88,6 +88,33 @@ module Manga
         }
       end
 
+      desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
+      method_option :site, :default => 'MangaFox'
+      def fsck(series)
+        site = ("Manga::Squirrel::"+options[:site]).to_class
+        expectedChapters = site::getChapters(series, {:volumes=>"true",:chapters=>"true"},{})
+        actualChapters = Array.new
+        Dir.glob(File.join(series,"*")).each {
+          |chapter|
+          info = revgendir(chapter)
+          actualChapters[info[:chapter]] = info
+        }
+        puts expectedChapters.inspect
+        puts "#####################################################################"
+        puts actualChapters.inspect
+
+        #Assume expectedChapters has all of them (Dangerous assumption with scanlations, but hey)
+        expectedChapters.peach {
+          |expectedChapter|
+          if actualChapters[expectedChapter[:chapter]].nil? then
+            puts "Missing chapter #{expectedChapter[:chapter]}"
+          else
+            puts "Found chapter #{expectedChapter[:chapter]} #{expectedChapter[:caption]}"
+          end
+
+        }
+      end
+
       no_tasks do
         def makequeue(action, options)
             Manga::Squirrel::Queuer.queue action, options
