@@ -24,11 +24,7 @@ module Manga
         existingChapters = Array.new
         Dir.glob(File.join(series,"*")).each {
           |chapter|
-          try = chapter.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)[3]
-          if try.nil? then
-            try = chapter.split(/(.*)\/([0-9.]+) (.*)/)[2]
-          end
-          existingChapters.push try.to_f
+          existingChapters.push revgendir(chapter)[:chapter].to_f
         }
         
         chapters = site::getChapters(seriesSan, options, existingChapters)
