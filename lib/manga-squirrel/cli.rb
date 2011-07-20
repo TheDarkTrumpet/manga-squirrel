@@ -99,20 +99,30 @@ module Manga
           info = revgendir(chapter)
           actualChapters[info[:chapter]] = info
         }
-        puts expectedChapters.inspect
-        puts "#####################################################################"
-        puts actualChapters.inspect
+
+        numMissingChapters = 0
+        numMissingImages = 0
 
         #Assume expectedChapters has all of them (Dangerous assumption with scanlations, but hey)
-        expectedChapters.peach {
+        expectedChapters.each {
           |expectedChapter|
-          if actualChapters[expectedChapter[:chapter]].nil? then
+          if actualChapters[expectedChapter[:chapter].to_f].nil? then
             puts "Missing chapter #{expectedChapter[:chapter]}"
+            self.makequeue QueueAction::Download, {:site=>site, :series=>series, :options=>{:volumes=>"true",:chapters=>expectedChapter[:chapter].to_f}}
+            numMissingChapters += 1
           else
-            puts "Found chapter #{expectedChapter[:chapter]} #{expectedChapter[:caption]}"
+                  actualImages = Dir.entries(gendir(expectedChapter)).reject{|entry| entry == "." || entry == ".."}
+                  expectedChapter[:pages].each {
+                    |ip|
+                    if actualImages.include?(ip[1]+"")
+                  }
           end
-
         }
+        
+        puts "Summary Statistics"
+        puts "------------------"
+        puts "Missing Chapters: #{numMissingChapters}"
+        puts "Missing Images: #{numMissingImages}"
       end
 
       no_tasks do

@@ -17,10 +17,8 @@ end
 
 #Within limits reverses the gendir procedure
 def revgendir(filename)
-  puts filename.inspect
   chapter = {}
   try = filename.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)
-  puts try.inspect
   if try[3].nil? then
     try = filename.split(/(.*)\/([0-9.]+) (.*)/)
     puts try.inspect

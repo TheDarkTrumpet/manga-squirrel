@@ -37,7 +37,6 @@ module Manga
         chapters.each {
           |chapter|
           
-          chapter[:root] = File.expand_path(".")
           path = gendir(chapter) 
 
           1.upto(chapter[:pages]) {
