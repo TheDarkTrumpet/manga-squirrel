@@ -107,11 +107,16 @@ module Manga
         chapter[:chapter] = $4
         chapter[:caption] = $5 || ''
 
-        chapter[:pages] = doc.css("select.middle option[selected=selected]").first.parent.children.count
-    
         chapter[:url] = url
 
         chapter[:img_div] = IMG_DIV
+        chapter[:root] = File.expand_path(".")
+
+        pagesDoc = doc.css("select.middle").to_s
+        pages = pagesDoc.scan(/<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/).map { |x| ["/manga/#{self.urlify chapter[:series]}/#{x[0]}",x[0]] }
+
+        chapter[:pages] = pages.count
+        chapter[:pages_info] = pages
 
         chapter
       end

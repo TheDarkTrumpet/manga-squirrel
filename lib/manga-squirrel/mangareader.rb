@@ -106,16 +106,16 @@ module Manga
         chapter[:chapter] = self.getChapter(v)
         chapter[:caption] = v[2]
         
+        chapter[:url] = BASE_URL + v[0]
+
+        chapter[:img_div] = IMG_DIV
+        chapter[:root] = File.expand_path(".")
 
         pagesDoc = doc.css('select[id^="pageMenu"]').to_s
         pages = pagesDoc.scan(/<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/)
 
         chapter[:pages] = pages.count
         chapter[:pages_info] = pages
-
-        chapter[:url] = BASE_URL + v[0]
-
-        chapter[:img_div] = IMG_DIV
 
         chapter
       end
