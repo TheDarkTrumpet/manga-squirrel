@@ -80,8 +80,8 @@ module Manga
           chapter_pass
         end
 
-      #rescue Exception => e
-      # puts "ERROR: Could not get the chapter list from MangaReader."
+      rescue Exception => e
+       puts "ERROR: Could not get the chapter list from MangaReader."
       end
 
       def self.getChapter(v)

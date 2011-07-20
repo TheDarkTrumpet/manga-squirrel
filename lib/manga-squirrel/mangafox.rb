@@ -47,7 +47,7 @@ module Manga
 
       private
       def self.parseChapters(series, options)
-        url = "#{BASE_URL}/manga/#{series}"
+        url = "#{BASE_URL}/manga/#{self.urlify series}"
     
         doc = Nokogiri::HTML(open(url))
 
