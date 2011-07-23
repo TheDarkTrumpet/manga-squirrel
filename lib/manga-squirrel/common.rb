@@ -12,7 +12,7 @@ module Manga
 end
 
 def gendir(chapter)
-  File.join(File.expand("."), chapter[:series].sanitize, "#{[chapter[:volume], chapter[:chapter]].compact.join('-')} #{chapter[:caption].sanitize}")
+  File.join(File.expand_path("."), chapter[:series].sanitize, "#{[chapter[:volume], "#{"%03d" % chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].sanitize}")
 end
 
 #Within limits reverses the gendir procedure
@@ -21,7 +21,6 @@ def revgendir(filename)
   try = filename.split(/(.*)\/([0-9]+)-([0-9.]+) (.*)/)
   if try[3].nil? then
     try = filename.split(/(.*)\/([0-9.]+) (.*)/)
-    puts try.inspect
     chapter[:series] = try[1]
     chapter[:volume] = nil
     chapter[:chapter] = try[2].to_f
@@ -38,7 +37,7 @@ end
 
 class String
   def sanitize
-    self.gsub(/[\\\?%:|"<>\*]/, '')
+    self.gsub(/[\\\?%:|"<>\*]/, '').gsub(/\\/,'\\\\')
   end
 end
 

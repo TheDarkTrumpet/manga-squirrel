@@ -4,6 +4,7 @@ require 'open-uri'
 require 'fileutils'
 require 'zip/zip'
 require 'manga-squirrel/common'
+require 'peach'
 
 module Manga
   module Squirrel
@@ -21,8 +22,9 @@ module Manga
       end
 
       def self.doDownload(chapter)
-        chapter.pages.each { 
+        chapter[:pages].peach { 
         |page|
+          page = Hash.transform_keys_to_symbols(page)
           doc = Nokogiri::HTML(open(page[:url]))
 
           img = doc.css(chapter[:img_div]).attribute('src').value

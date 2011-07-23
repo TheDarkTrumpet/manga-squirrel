@@ -31,8 +31,8 @@ module Manga
         return t[0],t[2],t[3].to_f,t[4]
       end
 
-      def getPageURL(page)
-        getSeriesURL + "/#{page}"
+      def getPageURL(chapter, page)
+        "#{getSeriesURL}/v#{chapter[:volume]}/c#{"%03d" % chapter[:chapter]}/#{page}.html"
       end
     end
   end

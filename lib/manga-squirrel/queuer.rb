@@ -26,9 +26,9 @@ module Manga
         }
 
         dlChapters = []
-        series.chapters.each {
+        series.chapters.each_value {
           |chapter|
-          if exstingChapters.include?(chapter[:chapter])
+          if existingChapters.include?(chapter[:chapter])
             next
           end
           Resque.enqueue(Manga::Squirrel::Worker, QueueAction::Download, chapter)

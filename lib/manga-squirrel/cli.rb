@@ -89,6 +89,7 @@ module Manga
                   expectedChapter[:pages].each {
                     |ip|
                     if actualImages.include?(ip[1]+"")
+                    end
                   }
           end
         }

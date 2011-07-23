@@ -44,7 +44,7 @@ module Manga
         return t[0],nil,t[1].to_f,t[2]
       end
 
-      def getPageURL(page)
+      def getPageURL(chapter, page)
         BASE_URL + page
       end
     end
