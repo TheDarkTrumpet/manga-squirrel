@@ -1,123 +1,49 @@
-require 'rubygems'
-require 'nokogiri'
-require 'open-uri'
-require 'progressbar'
-require 'peach'
+require 'manga-squirrel/site'
 
 module Manga
   module Squirrel
-    class Manga::Squirrel::MangaReader
-      BASE_URL = "http://www.mangareader.net"
-      IMG_DIV = "img"
-	  @@chapterlist = {}
+    class Manga::Squirrel::MangaReaderSeries < Manga::Squirrel::Series
+      @base_url = "http://www.mangareader.net"
+      @img_div = "#img"
 
-      def self.getChapters(series, options, existingChapters)
-        if @@chapterlist.include?(series) then
-          return @@chapterlist[series]
-        end
+      @series_list_css = 'div[class^="series_col"]'
+      @series_list_regex = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/ 
 
-        chapters = Array.new
-        tmp = self.parseChapters(series, options)
-        pbar = ProgressBar.new(series, tmp.count)
-        tmp.peach {
-          |v|
-          pbar.inc
-          chapter = self.getChapter(v)
-          if existingChapters.include?(chapter) then
-            next
-          end
-          chapters.push self.parseChapter(series, v)
-        }
-        pbar.finish
+      @chapter_list_css = 'div[id^="chapterlist"]'
+      @chapter_list_regex = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/
 
-        @@chapterlist[series] = chapters
+      @chapter_info_css = 'meta[name="description"]'
+      #Gives: series, caption, chapter, page
+      @chapter_info_regex = /(.+): (.+) ([0-9]+) - Read .* Page ([0-9]+)\./
 
-        chapters
-      end
-
-      def self.getPageURL(chapter, page)
-        return BASE_URL + chapter[:pages_info][page-1][0]
-      end
-
-      def self.urlify(series)
-        series.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
-      end
+      @pages_css = 'select[id^="pageMenu"]'
+      @pages_regex = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
 
       private
-      #Return hash key: series name, value:url
-      def self.getSeriesURL(series)
-        doc = Nokogiri::HTML(open(BASE_URL + "/alphabetical"))
-        allSeriesDoc = doc.css('div[class^="series_col"]').to_s
-        allSeries = {}
-        allSeriesDoc.scan(/<li>$*<a href="([^"]*)">([^<]*)<\/a>/).each {
+      def getSeriesURL()
+        #Because of mangareader's random system, we need to go look it up
+        doc = Nokogiri::HTML(open(@base_url + "/alphabetical"))
+        seriesList = doc.css(@series_list_css).to_s
+        series = {}
+        seriesList.scan(@series_list_regex).peach {
           |s|
-          allSeries[self.urlify s[1]] = s[0]
+          if @series.strip.urlify == s[1].strip.urlify
+            return s[0]
+          end
         }
-        allSeries[self.urlify series.strip]
+        raise SeriesNotFound
       end
 
-      #allChapters: array  0: url 1:series + number 2:title
-      def self.parseChapters(series, options)
-        url = self.getSeriesURL(series)
-        doc = Nokogiri::HTML(open(BASE_URL + url))
-        allChaptersDoc = doc.css('div[id^="chapterlist"]').to_s
-        allChapters = allChaptersDoc.scan(/<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/)
-        
-        chapter_filter = eval(options[:chapters])
-
-        allChapters.select do |v|
-          chapter = self.getChapter(v) 
-          chapter_pass = case chapter_filter.class.name
-                         when "Array", "Range"
-                           chapter_filter.include?(chapter)
-                         when "Fixnum", "Float"
-                           chapter_filter == chapter
-                         when "TrueClass", "FalseClass"
-                           chapter_filter
-                         else
-                           true
-                         end
-          chapter_pass
-        end
-
-      rescue Exception => e
-       puts "ERROR: Could not get the chapter list from MangaReader."
+      def getChapterURLList(doc)
+        doc.to_s.scan(@chapter_list_regex).collect { |c| @base_url + c[0] }
       end
 
-      def self.getChapter(v)
-              r = v[1].split(" ")
-              num = r[r.length-1]
-              ret = "%03d" % num.to_i
-              if num.include?(".") then
-                      ret += num.split(".")[1]
-              end
-              ret.to_f
+      def getChapterInfoProcess(t)
+        return t[0],nil,t[2].to_f,t[1]
       end
 
-      def self.parseChapter(series, v)
-        chapter = {}
-
-        doc = Nokogiri::HTML(open(BASE_URL + v[0]))
-        titleDoc = doc.css("meta[name='description']").attribute('content').value
-        title = titleDoc.scan(/(.+) [0-9]+ -/)
-        
-        chapter[:series] = title[0][0] 
-        chapter[:volume] = nil
-        chapter[:chapter] = self.getChapter(v)
-        chapter[:caption] = v[2]
-        
-        chapter[:url] = BASE_URL + v[0]
-
-        chapter[:img_div] = IMG_DIV
-        chapter[:root] = File.expand_path(".")
-
-        pagesDoc = doc.css('select[id^="pageMenu"]').to_s
-        pages = pagesDoc.scan(/<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/)
-
-        chapter[:pages] = pages.count
-        chapter[:pages_info] = pages
-
-        chapter
+      def getPageURL(page)
+        @base_url + page
       end
     end
   end
