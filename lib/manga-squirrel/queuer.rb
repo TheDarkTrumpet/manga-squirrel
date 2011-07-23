@@ -7,10 +7,10 @@ require 'manga-squirrel/worker'
 module Manga
   module Squirrel
     class Manga::Squirrel::Queuer
-      def self.queue(action, options)
+      def self.queue(action, series)
         case action
         when QueueAction::Download
-          self.queueDownload options[:site], options[:series], options[:options]
+          self.queueDownload series
         when QueueAction::Archive
           self.queueArchive options[:series], options[:options]
         end
@@ -18,37 +18,20 @@ module Manga
 
       private
 
-      def self.queueDownload(site, series, options)        
-        seriesSan = site::urlify(series)
-
-        existingChapters = Array.new
-        Dir.glob(File.join(series,"*")).each {
+      def self.queueDownload(series)        
+        existingChapters = []
+        Dir.glob(File.join(series.series,"*")).each {
           |chapter|
           existingChapters.push revgendir(chapter)[:chapter].to_f
         }
-        
-        chapters = site::getChapters(seriesSan, options, existingChapters)
 
-        if chapters.nil? then
-          puts "ERROR: no chapters retrieved"
-          return
-        end
-
-        chapters.each {
+        dlChapters = []
+        series.chapters.each {
           |chapter|
-          
-          path = gendir(chapter) 
-
-          1.upto(chapter[:pages]) {
-            |page|
-            page_url = site::getPageURL(chapter, page)
-
-            
-            Resque.enqueue(
-              Manga::Squirrel::Worker,
-              QueueAction::Download, {:chapter=>chapter, :page=>page, :url=>page_url}
-            )
-          }
+          if exstingChapters.include?(chapter[:chapter])
+            next
+          end
+          Resque.enqueue(Manga::Squirrel::Worker, QueueAction::Download, chapter)
         }
       end
 

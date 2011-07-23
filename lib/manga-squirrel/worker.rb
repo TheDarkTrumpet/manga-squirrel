@@ -10,25 +10,28 @@ module Manga
     class Manga::Squirrel::Worker
       @queue  = 'manga-squirrel'
 
-      def self.perform(action, options)
-        options = Hash.transform_keys_to_symbols(options)
+      def self.perform(action, chapter)
+        chapter = Hash.transform_keys_to_symbols(chapter)
         case action
         when QueueAction::Download
-          self.doDownload options[:chapter], options[:page], options[:url]
+          self.doDownload chapter
         when QueueAction::Archive
           self.doArchive options[:root], options[:chapter], options[:outdir]
         end
       end
 
-      def self.doDownload(chapter, page, url)
-        doc = Nokogiri::HTML(open(url))
+      def self.doDownload(chapter)
+        chapter.pages.each { 
+        |page|
+          doc = Nokogiri::HTML(open(page[:url]))
 
-        img = doc.css("#"+chapter[:img_div]).attribute('src').value
-        ext = img.gsub(/\.*(\.[^\.]*)$/).first
+          img = doc.css(chapter[:img_div]).attribute('src').value
+          ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
-        FileUtils.mkdir_p dir = gendir(chapter)
+          FileUtils.mkdir_p dir = gendir(chapter)
 
-        system 'curl', img, "-o", File.join(dir, "#{"%03d" % page}#{ext}")
+          system 'curl', img, "-o", File.join(dir, "#{"%03d" % page[:num]}#{ext}")
+        }
       end
 
       def self.doArchive(root, chapter, out)

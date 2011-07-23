@@ -61,7 +61,8 @@ module Manga
         chapter[:series],chapter[:volume],chapter[:chapter],chapter[:caption] = getChapterInfoProcess(title)
         chapter[:url] = url
 
-        chapter[:pages] = doc.css(self.class::PAGES_CSS).to_s.scan(self.class::PAGES_REGEX).map { |x| getPageURL(x[0]) }
+        chapter[:pages] = doc.css(self.class::PAGES_CSS).to_s.scan(self.class::PAGES_REGEX).map { |x| {:url=>getPageURL(x[0]), :num=>x[1]} }
+        chapter[:img_div] = self.class::IMG_DIV
         
         chapter
       end
