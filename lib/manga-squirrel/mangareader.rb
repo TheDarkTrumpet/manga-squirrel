@@ -1,49 +1,51 @@
-require 'manga-squirrel/site'
+require 'manga-squirrel/series'
 
 module Manga
   module Squirrel
-    class Manga::Squirrel::MangaReaderSeries < Manga::Squirrel::Series
-      @base_url = "http://www.mangareader.net"
-      @img_div = "#img"
+    class Manga::Squirrel::MangaReaderSeries 
+      include Manga::Squirrel::Series
 
-      @series_list_css = 'div[class^="series_col"]'
-      @series_list_regex = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/ 
+      BASE_URL = "http://www.mangareader.net"
+      IMG_DIV = "#img"
 
-      @chapter_list_css = 'div[id^="chapterlist"]'
-      @chapter_list_regex = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/
+      SERIES_LIST_CSS = 'div[class^="series_col"]'
+      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/ 
 
-      @chapter_info_css = 'meta[name="description"]'
+      CHAPTER_LIST_CSS = 'div[id^="chapterlist"]'
+      CHAPTER_LIST_REGEX = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/
+
+      CHAPTER_INFO_CSS = 'meta[name="description"]'
       #Gives: series, caption, chapter, page
-      @chapter_info_regex = /(.+): (.+) ([0-9]+) - Read .* Page ([0-9]+)\./
+      CHAPTER_INFO_REGEX = /(.+) ([0-9]+) - Read .* Page ([0-9]+)\./
 
-      @pages_css = 'select[id^="pageMenu"]'
-      @pages_regex = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
+      PAGES_CSS = 'select[id^="pageMenu"]'
+      PAGES_REGEX = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
 
       private
       def getSeriesURL()
         #Because of mangareader's random system, we need to go look it up
-        doc = Nokogiri::HTML(open(@base_url + "/alphabetical"))
-        seriesList = doc.css(@series_list_css).to_s
+        doc = Nokogiri::HTML(open(BASE_URL + "/alphabetical"))
+        seriesList = doc.css(SERIES_LIST_CSS).to_s
         series = {}
-        seriesList.scan(@series_list_regex).peach {
+        seriesList.scan(SERIES_LIST_REGEX).each {
           |s|
-          if @series.strip.urlify == s[1].strip.urlify
-            return s[0]
+          if urlify(@series.strip) == urlify(s[1].strip)
+            return BASE_URL + s[0]
           end
         }
         raise SeriesNotFound
       end
 
       def getChapterURLList(doc)
-        doc.to_s.scan(@chapter_list_regex).collect { |c| @base_url + c[0] }
+        doc.to_s.scan(CHAPTER_LIST_REGEX).collect { |c| BASE_URL + c[0] }
       end
 
       def getChapterInfoProcess(t)
-        return t[0],nil,t[2].to_f,t[1]
+        return t[0],nil,t[1].to_f,t[2]
       end
 
       def getPageURL(page)
-        @base_url + page
+        BASE_URL + page
       end
     end
   end
