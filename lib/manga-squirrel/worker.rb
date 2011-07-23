@@ -17,7 +17,7 @@ module Manga
         when QueueAction::Download
           self.doDownload chapter
         when QueueAction::Archive
-          self.doArchive options[:root], options[:chapter], options[:outdir]
+          self.doArchive chapter
         end
       end
 
@@ -36,23 +36,18 @@ module Manga
         }
       end
 
-      def self.doArchive(root, chapter, out)
-        dir = File.join(out, chapter)
+      def self.doArchive(chapter)
+        dir = File.join(File.expand_path("."), chapter)
+        FileUtils.mkdir_p(File.dirname(dir)) unless File.directory?(File.dirname(dir))
 
-        if not File.directory?(File.join(out,File.dirname(chapter))) then
-          FileUtils.mkdir_p File.join(out,File.dirname(chapter))
-        end
-
-        if File.exists?(dir+".cbz") then
-          File.delete(dir+".cbz")
-        end
+        File.delete(dir+".cbz") if File.exists?(dir+".cbz")
 
         Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
           |zipfile|
-          puts Dir.entries(File.join(root,chapter)).inspect
-          Dir.entries(File.join(root, chapter)).grep(/^[^.]/).sort.each { 
+          puts Dir.entries(dir).inspect
+          Dir.entries(dir).grep(/^[^.]/).sort.each { 
             |file|
-            zipfile.add(File.basename(file), File.join(root, chapter, file))
+            zipfile.add(File.basename(file), File.join(dir, file))
           }
         }
       end

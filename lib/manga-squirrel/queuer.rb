@@ -12,7 +12,7 @@ module Manga
         when QueueAction::Download
           self.queueDownload series
         when QueueAction::Archive
-          self.queueArchive options[:series], options[:options]
+          self.queueArchive series
         end
       end
 
@@ -35,16 +35,10 @@ module Manga
         }
       end
 
-      def self.queueArchive(series, options)
+      def self.queueArchive(series)
         Dir.glob(File.join(series,"*")).each {
           |chapter|
-
-          puts "QUEUE-CBZ: #{chapter}..."
-
-          Resque.enqueue(
-            Manga::Squirrel::Worker,
-            QueueAction::Archive, {:root=>File.expand_path("."), :chapter=>chapter, :outdir=>options[:out]}
-          )
+          Resque.enqueue(Manga::Squirrel::Worker, QueueAction::Archive, chapter)
         }
       end
     end
