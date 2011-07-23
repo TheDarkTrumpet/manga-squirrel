@@ -44,7 +44,6 @@ module Manga
 
         Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
           |zipfile|
-          puts Dir.entries(dir).inspect
           Dir.entries(dir).grep(/^[^.]/).sort.each { 
             |file|
             zipfile.add(File.basename(file), File.join(dir, file))
