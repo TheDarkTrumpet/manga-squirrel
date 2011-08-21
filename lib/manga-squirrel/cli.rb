@@ -31,11 +31,11 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'cbz series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'.
+      desc 'bundle series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'
       method_option :out, :default => "."
       method_option :force, :default => false
-      def cbz(series)
-        Manga::Squirrel::Queuer.queue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
+      def bundle(series)
+        Queuer.queueBundle, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
       end
 
       desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
@@ -45,12 +45,13 @@ module Manga
           |name, site, raw, out, autocbz, volume, chapter|
           puts "Fetching #{name]} from #{site}"
           begin
-            Manga::Squirrel::Queuer.queue QueueAction::Download, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz, :volume=>volume, :chapter=>chapter}]
+            Queuer.queueDownload, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz, :volume=>volume, :chapter=>chapter}]
           rescue
             #  puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
         f.close
+      end
 
       desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
       method_option :site, :default => 'MangaFox'
@@ -75,15 +76,15 @@ module Manga
             self.makequeue QueueAction::Download, {:site=>site, :series=>series, :options=>{:volumes=>"true",:chapters=>expectedChapter[:chapter].to_f}}
             numMissingChapters += 1
           else
-                  actualImages = Dir.entries(gendir(expectedChapter)).reject{|entry| entry == "." || entry == ".."}
-                  expectedChapter[:pages].each {
-                    |ip|
-                    if actualImages.include?(ip[1]+"")
-                    end
-                  }
+            actualImages = Dir.entries(gendir(expectedChapter)).reject{|entry| entry == "." || entry == ".."}
+            expectedChapter[:pages].each {
+              |ip|
+              if actualImages.include?(ip[1]+"")
+              end
+            }
           end
         }
-        
+
         puts "Summary Statistics"
         puts "------------------"
         puts "Missing Chapters: #{numMissingChapters}"
