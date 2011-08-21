@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'thor'
 require 'resque'
+require 'yaml'
 require 'manga-squirrel/common'
 require 'manga-squirrel/queuer'
 
@@ -30,36 +31,26 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'cbz series', 'Builds CBZs for all chapters for the specified series name'
+      desc 'cbz series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'.
+      method_option :out, :default => "."
+      method_option :force, :default => false
       def cbz(series)
-          Manga::Squirrel::Queuer.queue QueueAction::Archive, series.strip
+        Manga::Squirrel::Queuer.queue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
       end
 
-      desc 'fetch [--file=name]', 'Tries to fetch all mangas listed in filename, skipping any chapters already existing'
-      method_option :file, :default => ".ms"
+      desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
+      method_option :file, :default => "~/.ms"
       def fetch
-        begin
-          f = File.open(options[:file], 'r')
-        rescue
-          puts "ERROR: File #{options[:file]} not found"
-          return
+        Manga::Squirrel::ConfigFile.parse(options[:file]).each do
+          |name, site, raw, out, autocbz, volume, chapter|
+          puts "Fetching #{name]} from #{site}"
+          begin
+            Manga::Squirrel::Queuer.queue QueueAction::Download, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz, :volume=>volume, :chapter=>chapter}]
+          rescue
+            #  puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+          end
         end
-        f.readlines.each {
-          |line|
-          splits = line.strip.split('	')
-		      name = splits[0]
-          site = splits[1]
-          series = case site
-                   when "MangaFox"
-                     Manga::Squirrel::MangaFoxSeries.new(name)
-                   when "MangaReader"
-                     Manga::Squirrel::MangaReaderSeries.new(name)
-                   end
-          puts "Fetching #{name} at #{site}"
-          Manga::Squirrel::Queuer.queue QueueAction::Download, series
-        }
         f.close
-      end
 
       desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
       method_option :site, :default => 'MangaFox'
