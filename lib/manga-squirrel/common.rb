@@ -2,15 +2,6 @@ require 'fileutils'
 require 'manga-squirrel/mangafox'
 require 'manga-squirrel/mangareader'
 
-module Manga
-  module Squirrel
-    module QueueAction
-      Download = 0
-      Archive = 1
-    end
-  end
-end
-
 def gendir(chapter)
   File.join(File.expand_path("."), chapter[:series].sanitize, "#{[chapter[:volume], "#{"%03d" % chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].sanitize}")
 end
