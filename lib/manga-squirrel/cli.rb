@@ -37,15 +37,15 @@ module Manga
       def bundle(series)
         Manga::Squirrel::ConfigFile.parse(options[:file]).each do
           |name, site, raw, out, autocbz, volume, chapter, cbf|
-          puts "Bundling #{name]}"
+          puts "Bundling #{name}"
           begin
-            Queuer.queueBundle, :series=>name,
-                                :raw=>raw,
-                                :out=>out,
-                                :cbf=>cbf,
-                                :force=>options[:force]
+            Queuer.queueBundle :series=>name,
+              :raw=>raw,
+              :out=>out,
+              :cbf=>cbf,
+              :force=>options[:force]
           rescue
-            puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
+            #puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
       end
@@ -55,15 +55,15 @@ module Manga
       def fetch
         Manga::Squirrel::ConfigFile.parse(options[:file]).each do
           |name, site, raw, out, autocbz, volume, chapter, cbf|
-          puts "Fetching #{name]} from #{site}"
+          puts "Fetching #{name} from #{site}"
           begin
-            Queuer.queueDownload, :site=>site, 
-                                  :series=>name, 
-                                  :raw=>raw, 
-                                  :volume=>volume, 
-                                  :chapter=>chapter
+            Queuer.queueDownload :site=>site, 
+              :series=>name, 
+              :raw=>raw, 
+              :volume=>volume, 
+              :chapter=>chapter
           rescue
-            puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+            # puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
       end
