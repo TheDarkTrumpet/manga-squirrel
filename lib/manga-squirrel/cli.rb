@@ -51,6 +51,43 @@ module Manga
           end
         end
         f.close
+
+      desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
+      method_option :site, :default => 'MangaFox'
+      def fsck(series)
+        site = ("Manga::Squirrel::"+options[:site]).to_class
+        expectedChapters = site::getChapters(series, {:volumes=>"true",:chapters=>"true"},{})
+        actualChapters = Array.new
+        Dir.glob(File.join(series,"*")).each {
+          |chapter|
+          info = revgendir(chapter)
+          actualChapters[info[:chapter]] = info
+        }
+
+        numMissingChapters = 0
+        numMissingImages = 0
+
+        #Assume expectedChapters has all of them (Dangerous assumption with scanlations, but hey)
+        expectedChapters.each {
+          |expectedChapter|
+          if actualChapters[expectedChapter[:chapter].to_f].nil? then
+            puts "Missing chapter #{expectedChapter[:chapter]}"
+            self.makequeue QueueAction::Download, {:site=>site, :series=>series, :options=>{:volumes=>"true",:chapters=>expectedChapter[:chapter].to_f}}
+            numMissingChapters += 1
+          else
+                  actualImages = Dir.entries(gendir(expectedChapter)).reject{|entry| entry == "." || entry == ".."}
+                  expectedChapter[:pages].each {
+                    |ip|
+                    if actualImages.include?(ip[1]+"")
+                    end
+                  }
+          end
+        }
+        
+        puts "Summary Statistics"
+        puts "------------------"
+        puts "Missing Chapters: #{numMissingChapters}"
+        puts "Missing Images: #{numMissingImages}"
       end
     end
   end
