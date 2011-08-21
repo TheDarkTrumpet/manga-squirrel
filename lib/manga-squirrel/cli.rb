@@ -31,10 +31,11 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'cbz series [--out=dir]', 'Builds CBZs for all chapters for the specified series name'
+      desc 'cbz series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'.
       method_option :out, :default => "."
+      method_option :force, :default => false
       def cbz(series)
-        Manga::Squirrel::Queuer.queue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out])}}
+        Manga::Squirrel::Queuer.queue QueueAction::Archive, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
       end
 
       desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'

@@ -18,9 +18,7 @@ module Manga
 
       private
 
-      def self.queueDownload(site, series, options)        
-        seriesSan = site::urlify(series)
-
+      def self.getExisting(series)
         existingChapters = Array.new
         Dir.glob(File.join(series,"*")).each {
           |chapter|
@@ -30,7 +28,13 @@ module Manga
           end
           existingChapters.push try.to_f
         }
-        
+        existingChapters
+      end
+
+      def self.queueDownload(site, series, options)        
+        seriesSan = site::urlify(series)
+
+        existingChapters = self.getExisting(series)
         chapters = site::getChapters(seriesSan, options, existingChapters)
 
         if chapters.nil? then
@@ -60,6 +64,10 @@ module Manga
       def self.queueArchive(series, options)
         Dir.glob(File.join(series,"*")).each {
           |chapter|
+
+          if File.exists? File.join(options[:out],series,chapter+".cbz") and not options[:force] then
+                  next
+          end 
 
           puts "QUEUE-CBZ: #{chapter}..."
 
