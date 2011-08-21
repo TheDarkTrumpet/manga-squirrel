@@ -15,7 +15,9 @@ module Manga
             raw = series[:raw] || config[:raw] || "~/"
             out = series[:out] || config[:out] || "~/"
             autocbz = series[:autocbz] || config[:autocbz] || false
-            yield series[:name], site, raw, out, autocbz
+            volume = series[:volume] || "true"
+            chapter = series[:chapter] || "true"
+            yield series[:name], site, raw, out, autocbz, volume, chapter
           end
         end
       end

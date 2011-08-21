@@ -41,10 +41,10 @@ module Manga
       method_option :file, :default => "~/.ms"
       def fetch
         Manga::Squirrel::ConfigFile.parse(options[:file]).each do
-          |name, site, raw, out, autocbz|
+          |name, site, raw, out, autocbz, volume, chapter|
           puts "Fetching #{name]} from #{site}"
           begin
-            Manga::Squirrel::Queuer.queue QueueAction::Download, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz}]
+            Manga::Squirrel::Queuer.queue QueueAction::Download, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz, :volume=>volume, :chapter=>chapter}]
           rescue
             #  puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
