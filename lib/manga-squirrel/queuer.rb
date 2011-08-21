@@ -8,10 +8,10 @@ require 'manga-squirrel/bundleworker'
 module Manga
   module Squirrel
     class Manga::Squirrel::Queuer
-      def self.queueDownload(site, series, options)        
-        seriesSan = site::urlify(series)
+      def self.queueDownload(options)        
+        seriesSan = site::urlify(options[:series])
 
-        existingChapters = self.getExisting(series)
+        existingChapters = self.getExisting(options[:raw], options[:series])
         chapters = site::getChapters(seriesSan, options, existingChapters)
 
         if chapters.nil? then
@@ -25,30 +25,31 @@ module Manga
           if existingChapters.include?(chapter[:chapter])
             next
           end
-          Resque.enqueue(Manga::Squirrel::DownloadWorker, chapter)
+          Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
+                                                          :site=>site,
+                                                          :raw=>options[:raw]
         end
       end
 
-      def self.queueBundle(series)
-        Dir.glob(File.join(series,"*")).each do
+      def self.queueBundle(options)
+        self.getExisting(options[:raw], options[:series]).each do
           |chapter|
 
-          if File.exists? File.join(options[:out],series,chapter+".cbz") and not options[:force] then
+          if File.size? genoutname(chapter, options[:cbf]) and not options[:force] then
             next
           end 
 
-          puts "QUEUE-CBZ: #{chapter}..."
-
-          Resque.enqueue(
-            Manga::Squirrel::BundleWorker, {:root=>File.expand_path("."), :chapter=>chapter, :outdir=>options[:out]}
-          )
+          Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter, 
+                                                        :raw=>options[:raw],
+                                                        :out=>options[:out], 
+                                                        :cbf=>options[:cbf]
         end
       end
 
       private
-      def self.getExisting(series)
+      def self.getExisting(raw, series)
         existingChapters = Array.new
-        Dir.glob(File.join(series,"*")).each do
+        Dir.glob(File.join(raw, series,"*")).each do
           |chapter|
           existingChapters.push revgendir(chapter)[:chapter].to_f
         end

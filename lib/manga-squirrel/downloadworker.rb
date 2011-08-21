@@ -9,8 +9,9 @@ module Manga
     class Manga::Squirrel::DownloadWorker
       @queue  = 'manga-squirrel'
 
-      def self.perform(action, chapter)
-        Hash.transform_keys_to_symbols(chapter)[:pages].peach do
+      def self.perform(options)
+        options = Hash.transform_keys_to_symbols(options)
+        Hash.transform_keys_to_symbols(options[:chapter])[:pages].peach do
         |page|
           page = Hash.transform_keys_to_symbols(page)
           doc = Nokogiri::HTML(open(page[:url]))
@@ -18,7 +19,7 @@ module Manga
           img = doc.css(chapter[:img_div]).attribute('src').value
           ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
-          FileUtils.mkdir_p dir = gendir(chapter)
+          FileUtils.mkdir_p dir = gendir(options[:raw], chapter)
 
           system 'curl', img, "-o", File.join(dir, "#{"%03d" % page[:num]}#{ext}")
         end

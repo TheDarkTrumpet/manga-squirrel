@@ -9,22 +9,25 @@ module Manga
     class Manga::Squirrel::BundleWorker
       @queue  = 'manga-squirrel'
 
-      def self.perform(action, chapter)
-        chapter = Hash.transform_keys_to_symbols(chapter)
+      def self.perform(options)
+        options = Hash.transform_keys_to_symbols(options)
+        chapter = Hash.transform_keys_to_symbols(options[:chapter])
 
-        dir = File.join(File.expand_path("."), chapter)
-        FileUtils.mkdir_p(File.dirname(dir)) unless File.directory?(File.dirname(dir))
+        file = genoutname(chapter options[:cbf])
+        FileUtils.mkdir_p(File.dirname(file)) unless File.directory?(File.dirname(file))
 
-        File.delete(dir+".cbz") if File.exists?(dir+".cbz")
+        File.delete(file) if File.exists?(file)
 
-        Zip::ZipFile.open(dir+".cbz", Zip::ZipFile::CREATE) { 
-          |zipfile|
-          puts Dir.entries(dir).inspect
-          Dir.entries(dir).grep(/^[^.]/).sort.each { 
-            |file|
-            zipfile.add(File.basename(file), File.join(dir, file))
-          }
-        }
+        if options[:cbf] == "cbz" then
+          Zip::ZipFile.open(file, Zip::ZipFile::CREATE) do 
+            |zipfile|
+            puts Dir.entries(dir).inspect
+            Dir.entries(dir).grep(/^[^.]/).sort.each do 
+              |file|
+              zipfile.add(File.basename(file), File.join(dir, file))
+            end
+          end
+        end
       end
     end
   end

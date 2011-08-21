@@ -17,7 +17,8 @@ module Manga
             autocbz = series[:autocbz] || config[:autocbz] || false
             volume = series[:volume] || "true"
             chapter = series[:chapter] || "true"
-            yield series[:name], site, raw, out, autocbz, volume, chapter
+            cbf = series[:cbf] || config[:cbf] || "cbz"
+            yield series[:name].strip, site, raw.strip, out.strip, autocbz, volume, chapter, cbf.strip
           end
         end
       end

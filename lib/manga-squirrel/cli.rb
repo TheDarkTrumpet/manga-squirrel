@@ -31,26 +31,41 @@ module Manga
         threads.each { |thread| thread.join }    
       end
 
-      desc 'bundle series [--force=false --out=dir]', 'Builds CBZs for all new chapters for the specified series name, unless forced'
-      method_option :out, :default => "."
+      desc 'bundle [--file=name --force=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
+      method_option :file, :default=> "~/.ms"
       method_option :force, :default => false
       def bundle(series)
-        Queuer.queueBundle, {:series=>series.strip, :options=>{:out=>File.expand_path(options[:out]), :force=>options[:force]}}
+        Manga::Squirrel::ConfigFile.parse(options[:file]).each do
+          |name, site, raw, out, autocbz, volume, chapter, cbf|
+          puts "Bundling #{name]}"
+          begin
+            Queuer.queueBundle, :series=>name,
+                                :raw=>raw,
+                                :out=>out,
+                                :cbf=>cbf,
+                                :force=>options[:force]
+          rescue
+            puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
+          end
+        end
       end
 
       desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
       method_option :file, :default => "~/.ms"
       def fetch
         Manga::Squirrel::ConfigFile.parse(options[:file]).each do
-          |name, site, raw, out, autocbz, volume, chapter|
+          |name, site, raw, out, autocbz, volume, chapter, cbf|
           puts "Fetching #{name]} from #{site}"
           begin
-            Queuer.queueDownload, [:site=>site, :series=>name, :options=>{:raw=>raw, :out=>out, :autocbz=>autocbz, :volume=>volume, :chapter=>chapter}]
+            Queuer.queueDownload, :site=>site, 
+                                  :series=>name, 
+                                  :raw=>raw, 
+                                  :volume=>volume, 
+                                  :chapter=>chapter
           rescue
-            #  puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+            puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
-        f.close
       end
 
       desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
