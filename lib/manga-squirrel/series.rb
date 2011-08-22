@@ -7,16 +7,20 @@ require 'peach'
 module Manga
   module Squirrel
     module Series
-      attr_accessor :chapters, :series
+      attr_accessor :existingChapters, :name, :root
 
-      def initialize(series)
-        @series = series
+      def initialize(options)
+        @name = options[:name]
+        @root = options[:root]
+
         @chapters = {}
+        @existingChapters = []
 
+        getExistingChapters
         chapters
       end
 
-      def chapters()
+      def chapters
         if @chapters.count == 0
           getChapters
         end
@@ -29,10 +33,17 @@ module Manga
       def urlify(str)
         str.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
       end
+
+      def getExistingChapters()
+        Dir.glob(File.join(@root, @name, "*")).each do
+          |chapter|
+          @existingChapters.push revgendir(chapter)[:chapter].to_f
+        end
+      end
       
       def getChapters()
         tmp = getChapterList
-        pbar = ProgressBar.new(self.series,tmp.count)
+        pbar = ProgressBar.new(@name,tmp.count)
         tmp.peach {
           |url|
           pbar.inc

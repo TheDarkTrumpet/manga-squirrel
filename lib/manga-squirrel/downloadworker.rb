@@ -16,10 +16,10 @@ module Manga
           page = Hash.transform_keys_to_symbols(page)
           doc = Nokogiri::HTML(open(page[:url]))
 
-          img = doc.css(chapter[:img_div]).attribute('src').value
+          img = doc.css(options[:chapter][:img_div]).attribute('src').value
           ext = img.gsub(/\.*(\.[^\.]*)$/).first
 
-          FileUtils.mkdir_p dir = gendir(options[:raw], chapter)
+          FileUtils.mkdir_p dir = gendir(options[:raw], options[:chapter])
 
           system 'curl', img, "-o", File.join(dir, "#{"%03d" % page[:num]}#{ext}")
         end

@@ -29,7 +29,7 @@ module Manga
         series = {}
         seriesList.scan(SERIES_LIST_REGEX).each {
           |s|
-          if urlify(@series.strip) == urlify(s[1].strip)
+          if urlify(@name.strip) == urlify(s[1].strip)
             return BASE_URL + s[0]
           end
         }

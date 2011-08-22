@@ -20,7 +20,7 @@ module Manga
       private
       def getSeriesURL()
         #Because of mangafox's systematic naming system - we can always find them
-        "#{BASE_URL}/manga/#{urlify(@series)}"
+        "#{BASE_URL}/manga/#{urlify(@name.strip)}"
       end
 
       def getChapterURLList(doc)

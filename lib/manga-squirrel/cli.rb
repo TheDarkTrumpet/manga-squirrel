@@ -4,6 +4,7 @@ require 'resque'
 require 'yaml'
 require 'manga-squirrel/common'
 require 'manga-squirrel/queuer'
+require 'manga-squirrel/config'
 
 module Manga
   module Squirrel
@@ -34,18 +35,19 @@ module Manga
       desc 'bundle [--file=name --force=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
       method_option :file, :default=> "~/.ms"
       method_option :force, :default => false
-      def bundle(series)
-        Manga::Squirrel::ConfigFile.parse(options[:file]).each do
-          |name, site, raw, out, autocbz, volume, chapter, cbf|
+      def bundle()
+        Manga::Squirrel::ConfigFile.parse(options[:file]) do
+          |name, series, raw, out, autocbz, volume, chapter, cbf|
           puts "Bundling #{name}"
           begin
-            Queuer.queueBundle :series=>name,
-              :raw=>raw,
-              :out=>out,
-              :cbf=>cbf,
-              :force=>options[:force]
+            Queuer.queueBundle :name=>name,
+                               :series=>series,
+                               :raw=>raw,
+                               :out=>out,
+                               :cbf=>cbf,
+                               :force=>options[:force]
           rescue
-            #puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
+            puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
       end
@@ -53,17 +55,17 @@ module Manga
       desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
       method_option :file, :default => "~/.ms"
       def fetch
-        Manga::Squirrel::ConfigFile.parse(options[:file]).each do
-          |name, site, raw, out, autocbz, volume, chapter, cbf|
-          puts "Fetching #{name} from #{site}"
+        Manga::Squirrel::ConfigFile.parse(options[:file]) do
+          |name, series, raw, out, autocbz, volume, chapter, cbf|
+          puts "Fetching #{name} as a #{series}"
           begin
-            Queuer.queueDownload :site=>site, 
-              :series=>name, 
-              :raw=>raw, 
-              :volume=>volume, 
-              :chapter=>chapter
-          rescue
-            # puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+            Queuer.queueDownload :name=>name,
+                                 :series=>series, 
+                                 :raw=>raw, 
+                                 :volume=>volume, 
+                                 :chapter=>chapter
+          #rescue
+          #   puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
       end
