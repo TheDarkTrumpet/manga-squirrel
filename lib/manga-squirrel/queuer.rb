@@ -8,7 +8,7 @@ require 'manga-squirrel/bundleworker'
 module Manga
   module Squirrel
     class Manga::Squirrel::Queuer
-      def self.queueDownload(options)        
+      def self.queueDownload(options)
 
         s = options[:series].new :name=>options[:name], :root=>options[:raw]
 
@@ -23,7 +23,6 @@ module Manga
             next
           end
           Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
-                                                          :site=>options[:site],
                                                           :raw=>options[:raw]
         end
       end
@@ -35,14 +34,14 @@ module Manga
 
           chapter = s.chapters[chapter_number]
           chapter[:out] = options[:out]
-          
+
           if File.size? genoutname(chapter, options[:cbf]) and not options[:force] then
             next
-          end 
+          end
 
-          Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter, 
+          Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter,
                                                         :raw=>options[:raw],
-                                                        :out=>options[:out], 
+                                                        :out=>options[:out],
                                                         :cbf=>options[:cbf]
         end
       end
