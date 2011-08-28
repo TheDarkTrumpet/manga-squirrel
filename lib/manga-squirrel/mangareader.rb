@@ -2,14 +2,14 @@ require 'manga-squirrel/series'
 
 module Manga
   module Squirrel
-    class Manga::Squirrel::MangaReaderSeries 
+    class Manga::Squirrel::MangaReaderSeries
       include Manga::Squirrel::Series
 
       BASE_URL = "http://www.mangareader.net"
       IMG_DIV = "#img"
 
       SERIES_LIST_CSS = 'div[class^="series_col"]'
-      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/ 
+      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/
 
       CHAPTER_LIST_CSS = 'div[id^="chapterlist"]'
       CHAPTER_LIST_REGEX = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/

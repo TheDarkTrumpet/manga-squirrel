@@ -19,7 +19,7 @@ module Manga
         bundledir = File.dirname bundle
 
         FileUtils.mkdir_p bundledir unless File.directory? bundledir
-        File.delete(file) if File.exists?(file)
+        File.delete(bundle) if File.exists?(bundle)
 
         case options[:cbf]
         when "cbz"
