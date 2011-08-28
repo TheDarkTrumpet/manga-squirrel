@@ -14,19 +14,20 @@ module Manga
         chapter = Hash.transform_keys_to_symbols(options[:chapter])
 
 
-        dir = File.join(options[:raw],options[:chapter])
-        file = genoutname(chapter, options[:cbf])
-        FileUtils.mkdir_p(File.dirname(file)) unless File.directory?(File.dirname(file))
+        dir = gendir options[:raw], chapter
+        bundle = genoutname chapter, options[:cbf]
+        bundledir = File.dirname bundle
 
+        FileUtils.mkdir_p bundledir unless File.directory? bundledir
         File.delete(file) if File.exists?(file)
 
-        if options[:cbf] == "cbz" then
-          Zip::ZipFile.open(file, Zip::ZipFile::CREATE) do 
+        case options[:cbf]
+        when "cbz"
+          Zip::ZipFile.open(bundle, Zip::ZipFile::CREATE) do
             |zipfile|
-            puts Dir.entries(dir).inspect
-            Dir.entries(dir).grep(/^[^.]/).sort.each do 
-              |file|
-              zipfile.add(File.basename(file), File.join(dir, file))
+            Dir.entries(dir).grep(/^[^.]/).sort.each do
+              |image|
+              zipfile.add(File.basename(image), File.join(dir, image))
             end
           end
         end
