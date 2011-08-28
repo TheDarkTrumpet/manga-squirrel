@@ -17,7 +17,7 @@ module Manga
         @existingChapters = []
 
         getExistingChapters
-        chapters
+        chapters unless options[:dontdownload]
       end
 
       def chapters
@@ -29,7 +29,7 @@ module Manga
       end
 
       private
-      
+
       def urlify(str)
         str.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
       end
@@ -40,7 +40,7 @@ module Manga
           @existingChapters.push revgendir(chapter)[:chapter].to_f
         end
       end
-      
+
       def getChapters()
         tmp = getChapterList
         pbar = ProgressBar.new(@name,tmp.count)
@@ -74,7 +74,7 @@ module Manga
 
         chapter[:pages] = doc.css(self.class::PAGES_CSS).to_s.scan(self.class::PAGES_REGEX).map { |x| {:url=>getPageURL(chapter, x[0]), :num=>x[1]} }
         chapter[:img_div] = self.class::IMG_DIV
-        
+
         chapter
       end
     end

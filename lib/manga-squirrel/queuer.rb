@@ -34,6 +34,7 @@ module Manga
           |chapter_number|
 
           chapter = s.chapters[chapter_number]
+          chapter[:out] = options[:out]
           
           if File.size? genoutname(chapter, options[:cbf]) and not options[:force] then
             next

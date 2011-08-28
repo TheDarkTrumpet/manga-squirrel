@@ -46,8 +46,8 @@ module Manga
                                :out=>out,
                                :cbf=>cbf,
                                :force=>options[:force]
-          rescue
-            puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
+          #rescue
+          #  puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
       end

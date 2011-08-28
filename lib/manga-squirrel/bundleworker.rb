@@ -14,7 +14,7 @@ module Manga
         chapter = Hash.transform_keys_to_symbols(options[:chapter])
 
 
-        dir = File.join(options[:root],options[:chapter])
+        dir = File.join(options[:raw],options[:chapter])
         file = genoutname(chapter, options[:cbf])
         FileUtils.mkdir_p(File.dirname(file)) unless File.directory?(File.dirname(file))
 

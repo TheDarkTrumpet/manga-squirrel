@@ -32,7 +32,7 @@ end
 
 class String
   def sanitize
-    self.gsub(/[\\\/\?%:|"<>\*]/, '')
+    self.gsub(/[\?%:|"<>\*]/, '').gsub(/[\\\/]/,'-')
   end
   def to_class
     chain = self.split "::"
