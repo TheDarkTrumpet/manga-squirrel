@@ -11,6 +11,10 @@ def outNum (num)
   "%05.1f" % num
 end
 
+def bundlePath (root, chapter, cbf)
+  "#{gendir root, chapter}.#{cbf}"
+end
+
 #Within limits reverses the gendir procedure
 def revgendir(filename)
   chapter = {}

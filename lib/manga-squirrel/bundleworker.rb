@@ -15,7 +15,7 @@ module Manga
 
 
         dir = gendir options[:raw], chapter
-        bundle = (gendir options[:out], chapter) + "." +options[:cbf]
+        bundle = bundlePath options[:out], chapter, options[:cbf]
         bundledir = File.dirname bundle
 
         FileUtils.mkdir_p bundledir unless File.directory? bundledir

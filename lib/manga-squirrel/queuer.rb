@@ -35,8 +35,12 @@ module Manga
           chapter = s.chapters[chapter_number]
           chapter[:out] = options[:out]
 
-          if File.size ((gendir chapter[:out], chapter) + "." + options[:cbf]) > 1024 and not options[:force] then
-            next
+          file = bundlePath chapter[:out], chapter, options[:cbf]
+
+          if File.exists? file then
+            if File.size? file > 1024 and not options[:force] then
+              next
+            end
           end
 
           Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter,
