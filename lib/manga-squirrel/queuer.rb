@@ -38,7 +38,7 @@ module Manga
           file = bundlePath chapter[:out], chapter, options[:cbf]
 
           if File.exists? file then
-            if File.size? file > 1024 and not options[:force] then
+            if File.size(file) > 1024 and not options[:force] then
               next
             end
           end
