@@ -24,7 +24,7 @@ module Manga
       end
 
       def getChapterURLList(doc)
-        doc.collect { |node| BASE_URL + node.attribute('href').value }.reverse
+        doc.collect { |node| [BASE_URL + node.attribute('href').value, nil] }.reverse
       end
 
       def getChapterInfoProcess(t)
