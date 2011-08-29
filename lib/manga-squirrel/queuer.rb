@@ -35,7 +35,7 @@ module Manga
           chapter = s.chapters[chapter_number]
           chapter[:out] = options[:out]
 
-          if File.size? ((gendir chapter[:out], chapter) + "." + options[:cbf]) and not options[:force] then
+          if File.size ((gendir chapter[:out], chapter) + "." + options[:cbf]) > 1024 and not options[:force] then
             next
           end
 
