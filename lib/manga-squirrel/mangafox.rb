@@ -32,7 +32,7 @@ module Manga
       end
 
       def getPageURL(chapter, page)
-        "#{getSeriesURL}/v#{chapter[:volume]}/c#{"%03d" % chapter[:chapter]}/#{page}.html"
+        "#{getSeriesURL}/v#{chapter[:volume]}/c#{outNum chapter[:chapter]}/#{page}.html"
       end
     end
   end
