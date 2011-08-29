@@ -32,6 +32,8 @@ module Manga
       end
 
       def getPageURL(chapter, page)
+        return "#{getSeriesURL}/c#{outNum chapter[:chapter]}/#{page}.html" if chapter[:volume].nil?
+
         "#{getSeriesURL}/v#{chapter[:volume]}/c#{outNum chapter[:chapter]}/#{page}.html"
       end
     end
