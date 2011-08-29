@@ -14,8 +14,8 @@ module Manga
           |series|
           sclass = "Manga::Squirrel::#{(series[:site] || config[:site] || "MangaFox")}Series".to_class
           name = series[:name]
-          raw = series[:raw] || config[:raw] || "~/"
-          out = series[:out] || config[:out] || "~/"
+          raw = File.expand_path(series[:raw] || config[:raw] || "~/")
+          out = File.expand_path(series[:out] || config[:out] || "~/")
           autocbz = series[:autocbz] || config[:autocbz] || false
           volume = series[:volume] || "true"
           chapter = series[:chapter] || "true"
