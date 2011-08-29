@@ -2,66 +2,47 @@ require 'rubygems'
 require 'fileutils'
 require 'resque'
 require 'manga-squirrel/common'
-require 'manga-squirrel/worker'
+require 'manga-squirrel/downloadworker'
+require 'manga-squirrel/bundleworker'
 
 module Manga
   module Squirrel
     class Manga::Squirrel::Queuer
-      def self.queue(action, series)
-        case action
-        when QueueAction::Download
-          self.queueDownload series
-        when QueueAction::Archive
-          self.queueArchive series
-        end
-      end
+      def self.queueDownload(options)
 
-      private
+        s = options[:series].new :name=>options[:name], :root=>options[:raw]
 
-      def self.getExisting(series)
-        existingChapters = Array.new
-        Dir.glob(File.join(series,"*")).each do
-          |chapter|
-          existingChapters.push revgendir(chapter)[:chapter].to_f
-        end
-        existingChapters
-      end
-
-      def self.queueDownload(site, series, options)        
-        seriesSan = site::urlify(series)
-
-        existingChapters = self.getExisting(series)
-        chapters = site::getChapters(seriesSan, options, existingChapters)
-
-        if chapters.nil? then
+        if s.chapters.nil? then
           puts "ERROR: no chapters retrieved"
           return
         end
 
-        dlChapters = []
-        series.chapters.each_value do
+        s.chapters.each_value do
           |chapter|
-          if existingChapters.include?(chapter[:chapter])
+          if s.existingChapters.include?(chapter[:chapter])
             next
           end
-          Resque.enqueue(Manga::Squirrel::Worker, QueueAction::Download, chapter)
+          Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
+                                                          :raw=>options[:raw]
         end
       end
 
-      def self.queueArchive(series)
-        Dir.glob(File.join(series,"*")).each do
-          |chapter|
+      def self.queueBundle(options)
+        s = options[:series].new :name=>options[:name], :root=>options[:raw]
+        s.existingChapters.each do
+          |chapter_number|
 
-          if File.exists? File.join(options[:out],series,chapter+".cbz") and not options[:force] then
-                  next
-          end 
+          chapter = s.chapters[chapter_number]
+          chapter[:out] = options[:out]
 
-          puts "QUEUE-CBZ: #{chapter}..."
+          if File.size ((gendir chapter[:out], chapter) + "." + options[:cbf]) > 1024 and not options[:force] then
+            next
+          end
 
-          Resque.enqueue(
-            Manga::Squirrel::Worker,
-            QueueAction::Archive, {:root=>File.expand_path("."), :chapter=>chapter, :outdir=>options[:out]}
-          )
+          Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter,
+                                                        :raw=>options[:raw],
+                                                        :out=>options[:out],
+                                                        :cbf=>options[:cbf]
         end
       end
     end

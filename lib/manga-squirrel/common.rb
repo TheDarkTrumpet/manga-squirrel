@@ -2,17 +2,13 @@ require 'fileutils'
 require 'manga-squirrel/mangafox'
 require 'manga-squirrel/mangareader'
 
-module Manga
-  module Squirrel
-    module QueueAction
-      Download = 0
-      Archive = 1
-    end
-  end
+def gendir(raw, chapter)
+  File.join(raw, chapter[:series].sanitize, "#{[chapter[:volume], "#{outNum chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].sanitize}")
 end
 
-def gendir(chapter)
-  File.join(File.expand_path("."), chapter[:series].sanitize, "#{[chapter[:volume], "#{"%03d" % chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].sanitize}")
+def outNum (num)
+  return "%03d" % num if num.to_i == num
+  "%05.1f" % num
 end
 
 #Within limits reverses the gendir procedure
@@ -37,7 +33,17 @@ end
 
 class String
   def sanitize
-    self.gsub(/[\\\?%:|"<>\*]/, '').gsub(/\\/,'-')
+    self.gsub(/[\?%:|"<>\*]/, '').gsub(/[\\\/]/,'-')
+  end
+  def to_class
+    chain = self.split "::"
+    klass = Kernel
+    chain.each do |klass_string|
+      klass = klass.const_get klass_string
+    end
+    klass.is_a?(Class) ? klass : nil
+  rescue NameError
+    nil
   end
 end
 

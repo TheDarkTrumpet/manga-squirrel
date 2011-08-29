@@ -7,16 +7,20 @@ require 'peach'
 module Manga
   module Squirrel
     module Series
-      attr_accessor :chapters, :series
+      attr_accessor :existingChapters, :name, :root
 
-      def initialize(series)
-        @series = series
+      def initialize(options)
+        @name = options[:name]
+        @root = options[:root]
+
         @chapters = {}
+        @existingChapters = []
 
-        chapters
+        getExistingChapters
+        chapters unless options[:dontdownload]
       end
 
-      def chapters()
+      def chapters
         if @chapters.count == 0
           getChapters
         end
@@ -25,18 +29,28 @@ module Manga
       end
 
       private
-      
+
       def urlify(str)
         str.downcase.gsub(/[^\w -]/,"").gsub(/[ -]/,"_")
       end
-      
+
+      def getExistingChapters()
+        Dir.glob(File.join(@root, @name, "*")).each do
+          |chapter|
+          @existingChapters.push revgendir(chapter)[:chapter].to_f
+        end
+      end
+
       def getChapters()
         tmp = getChapterList
-        pbar = ProgressBar.new(self.series,tmp.count)
+        pbar = ProgressBar.new(@name,tmp.count)
         tmp.peach {
-          |url|
+          |array|
           pbar.inc
-          i = getChapterInfo(url)
+          url = array[0]
+          caption = array[1]
+
+          i = getChapterInfo(url,caption)
           @chapters[i[:chapter]] = i
         }
         pbar.finish
@@ -46,24 +60,28 @@ module Manga
         url = getSeriesURL()
 
         doc = Nokogiri::HTML(open(url))
-        getChapterURLList(doc.css(self.class::CHAPTER_LIST_CSS)).peach {
-          |chapter_url|
-          tmp = getChapterInfo(chapter_url)
-        }
+        getChapterURLList(doc.css(self.class::CHAPTER_LIST_CSS))
       end
 
-      def getChapterInfo(url)
+      def getChapterInfo(url, caption)
         chapter = {}
 
         doc = Nokogiri::HTML(open(url))
         title = doc.css(self.class::CHAPTER_INFO_CSS).attribute('content').value.scan(self.class::CHAPTER_INFO_REGEX)[0]
 
-        chapter[:series],chapter[:volume],chapter[:chapter],chapter[:caption] = getChapterInfoProcess(title)
+        chapter[:series],chapter[:volume],chapter[:chapter],otherCaption = getChapterInfoProcess(title)
+
+        if caption.nil? then
+          chapter[:caption] = otherCaption
+        else
+          chapter[:caption] = caption
+        end if
+
         chapter[:url] = url
 
         chapter[:pages] = doc.css(self.class::PAGES_CSS).to_s.scan(self.class::PAGES_REGEX).map { |x| {:url=>getPageURL(chapter, x[0]), :num=>x[1]} }
         chapter[:img_div] = self.class::IMG_DIV
-        
+
         chapter
       end
     end

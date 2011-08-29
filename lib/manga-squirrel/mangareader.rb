@@ -2,20 +2,21 @@ require 'manga-squirrel/series'
 
 module Manga
   module Squirrel
-    class Manga::Squirrel::MangaReaderSeries 
+    class Manga::Squirrel::MangaReaderSeries
       include Manga::Squirrel::Series
 
       BASE_URL = "http://www.mangareader.net"
       IMG_DIV = "#img"
 
       SERIES_LIST_CSS = 'div[class^="series_col"]'
-      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/ 
+      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/
 
       CHAPTER_LIST_CSS = 'div[id^="chapterlist"]'
+      #Gives: url, (name + number), caption
       CHAPTER_LIST_REGEX = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/
 
       CHAPTER_INFO_CSS = 'meta[name="description"]'
-      #Gives: series, caption, chapter, page
+      #Gives: series, -  chapter, page
       CHAPTER_INFO_REGEX = /(.+) ([0-9]+) - Read .* Page ([0-9]+)\./
 
       PAGES_CSS = 'select[id^="pageMenu"]'
@@ -29,7 +30,7 @@ module Manga
         series = {}
         seriesList.scan(SERIES_LIST_REGEX).each {
           |s|
-          if urlify(@series.strip) == urlify(s[1].strip)
+          if urlify(@name.strip) == urlify(s[1].strip)
             return BASE_URL + s[0]
           end
         }
@@ -37,7 +38,7 @@ module Manga
       end
 
       def getChapterURLList(doc)
-        doc.to_s.scan(CHAPTER_LIST_REGEX).collect { |c| BASE_URL + c[0] }
+        doc.to_s.scan(CHAPTER_LIST_REGEX).collect { |c| [BASE_URL + c[0], c[2]] }
       end
 
       def getChapterInfoProcess(t)

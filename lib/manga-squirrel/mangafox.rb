@@ -20,11 +20,11 @@ module Manga
       private
       def getSeriesURL()
         #Because of mangafox's systematic naming system - we can always find them
-        "#{BASE_URL}/manga/#{urlify(@series)}"
+        "#{BASE_URL}/manga/#{urlify(@name.strip)}"
       end
 
       def getChapterURLList(doc)
-        doc.collect { |node| BASE_URL + node.attribute('href').value }.reverse
+        doc.collect { |node| [BASE_URL + node.attribute('href').value, nil] }.reverse
       end
 
       def getChapterInfoProcess(t)
@@ -32,7 +32,9 @@ module Manga
       end
 
       def getPageURL(chapter, page)
-        "#{getSeriesURL}/v#{chapter[:volume]}/c#{"%03d" % chapter[:chapter]}/#{page}.html"
+        return "#{getSeriesURL}/c#{outNum chapter[:chapter]}/#{page}.html" if chapter[:volume].nil?
+
+        "#{getSeriesURL}/v#{chapter[:volume]}/c#{outNum chapter[:chapter]}/#{page}.html"
       end
     end
   end
