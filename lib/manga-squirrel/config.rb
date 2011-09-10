@@ -20,8 +20,9 @@ module Manga
           volume = series[:volume] || "true"
           chapter = series[:chapter] || "true"
           cbf = series[:cbf] || config[:cbf] || "cbz"
+          finished = series[:finished] || false
 
-          yield name,sclass,raw,out,autocbz,volume,chapter,cbf
+          yield name,sclass,raw,out,autocbz,volume,chapter,cbf,finished
         end
       end
     end

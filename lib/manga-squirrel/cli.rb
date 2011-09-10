@@ -29,7 +29,7 @@ module Manga
           end
         end
 
-        threads.each { |thread| thread.join }    
+        threads.each { |thread| thread.join }
       end
 
       desc 'bundle [--file=name --force=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
@@ -37,7 +37,7 @@ module Manga
       method_option :force, :default => false
       def bundle()
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
-          |name, series, raw, out, autocbz, volume, chapter, cbf|
+          |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
           puts "Bundling #{name}"
           begin
             Queuer.queueBundle :name=>name,
@@ -56,16 +56,20 @@ module Manga
       method_option :file, :default => "~/.ms"
       def fetch
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
-          |name, series, raw, out, autocbz, volume, chapter, cbf|
-          puts "Fetching #{name} as a #{series}"
-          begin
-            Queuer.queueDownload :name=>name,
-                                 :series=>series, 
-                                 :raw=>raw, 
-                                 :volume=>volume, 
-                                 :chapter=>chapter
-          #rescue
-          #   puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+          |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
+          if finished then
+            puts "Skipping #{name}"
+          else
+            puts "Fetching #{name} as a #{series}"
+            begin
+              Queuer.queueDownload :name=>name,
+                                   :series=>series,
+                                   :raw=>raw,
+                                   :volume=>volume,
+                                   :chapter=>chapter
+            #rescue
+            #   puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
+            end
           end
         end
       end
