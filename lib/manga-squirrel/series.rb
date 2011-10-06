@@ -43,17 +43,17 @@ module Manga
 
       def getChapters()
         tmp = getChapterList
-        pbar = ProgressBar.new(@name,tmp.count)
+        pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
         tmp.peach {
           |array|
-          pbar.inc
+          pbar.inc unless $isDaemon
           url = array[0]
           caption = array[1]
 
           i = getChapterInfo(url,caption)
           @chapters[i[:chapter]] = i
         }
-        pbar.finish
+        pbar.finish unless $isDaemon
       end
 
       def getChapterList()

@@ -32,10 +32,14 @@ module Manga
         threads.each { |thread| thread.join }
       end
 
-      desc 'bundle [ --file=name --force=false ]', 'Builds comic book archives for all new chapters for all the series listed in filename'
+      desc 'bundle [ --file=name --force=false --daemon=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
       method_option :file, :default=> "~/.ms"
       method_option :force, :default => false
+      method_option :daemon, :default => false
       def bundle()
+
+        $isDaemon = options[:daemon]
+
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
           |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
           puts "Bundling #{name}"
@@ -52,9 +56,13 @@ module Manga
         end
       end
 
-      desc 'fetch [ --file=name ]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
+      desc 'fetch [ --file=name --daemon=false ]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
       method_option :file, :default => "~/.ms"
+      method_option :daemon, :default => false
       def fetch
+
+        $isDaemon = options[:daemon]
+
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
           |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
           if finished then
