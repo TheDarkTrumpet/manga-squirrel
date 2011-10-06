@@ -32,7 +32,7 @@ module Manga
         threads.each { |thread| thread.join }
       end
 
-      desc 'bundle [--file=name --force=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
+      desc 'bundle [ --file=name --force=false ]', 'Builds comic book archives for all new chapters for all the series listed in filename'
       method_option :file, :default=> "~/.ms"
       method_option :force, :default => false
       def bundle()
@@ -52,7 +52,7 @@ module Manga
         end
       end
 
-      desc 'fetch [--file=name]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
+      desc 'fetch [ --file=name ]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
       method_option :file, :default => "~/.ms"
       def fetch
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
@@ -74,7 +74,7 @@ module Manga
         end
       end
 
-      desc 'fsck series [--site=site]', '**SLOW** Looks for missing chapters + pages'
+      desc 'fsck series [ --site=site ]', '**SLOW** Looks for missing chapters + pages'
       method_option :site, :default => 'MangaFox'
       def fsck(series)
         site = ("Manga::Squirrel::"+options[:site]).to_class
