@@ -39,6 +39,7 @@ module Manga
       def bundle()
 
         $isDaemon = options[:daemon]
+        $log = []
 
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
           |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
@@ -54,6 +55,13 @@ module Manga
           #  puts "ERROR: Failed to bundle #{name}\n#{$0} #{$.}: #{$!}"
           end
         end
+
+        puts "-" * 50
+        puts "Queued:"
+        $log.each do
+          |chapter|
+          puts "#{chapter[:series]}> #{chapter[:chapter]} - #{chapter[:caption]}"
+        end
       end
 
       desc 'fetch [ --file=name --daemon=false ]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
@@ -62,6 +70,7 @@ module Manga
       def fetch
 
         $isDaemon = options[:daemon]
+        $log = []
 
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
           |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
@@ -79,6 +88,13 @@ module Manga
             #   puts "ERROR: Failed to fetch #{name}\n#{$0} #{$.}: #{$!}"
             end
           end
+        end
+
+        puts "-" * 50
+        puts "Queued:"
+        $log.each do
+          |chapter|
+          puts "#{chapter[:series]}> #{chapter[:chapter]} - #{chapter[:caption]}"
         end
       end
 

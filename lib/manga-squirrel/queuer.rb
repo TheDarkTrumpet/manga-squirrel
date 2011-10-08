@@ -24,6 +24,8 @@ module Manga
           end
           Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
                                                           :raw=>options[:raw]
+
+          $log.push chapter
         end
       end
 
@@ -47,6 +49,7 @@ module Manga
                                                         :raw=>options[:raw],
                                                         :out=>options[:out],
                                                         :cbf=>options[:cbf]
+          $log.push chapter
         end
       end
     end
