@@ -14,8 +14,8 @@ module Manga
       #Gives series, x, volume, chapter, caption
       CHAPTER_INFO_REGEX = /(.*?) Manga (Vol\.([X0-9]+) )?Ch\.([0-9\.]+):? ?(.*)$/
 
-      PAGES_CSS = 'select.middle'
-      PAGES_REGEX = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
+      PAGES_CSS = 'script'
+      PAGES_REGEX = /var\s+total_pages\s*=\s*(\d+);/
 
       private
       def getSeriesURL()
@@ -29,6 +29,11 @@ module Manga
 
       def getChapterInfoProcess(t)
         return t[0],t[2],t[3].to_f,t[4]
+      end
+
+      def getPages(doc, chapter)
+        num_pages = doc.css(PAGES_CSS).to_s.match(PAGES_REGEX)[1].to_i
+        num_pages.times.map { |i| {:url=>getPageURL(chapter, i+1), :num=>i+1} }
       end
 
       def getPageURL(chapter, page)
