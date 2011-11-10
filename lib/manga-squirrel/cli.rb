@@ -47,7 +47,7 @@ module Manga
         $log = []
 
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
-          |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
+          |name, series, raw, out, volume, chapter, cbf, finished|
           puts "Bundling #{name}"
           begin
             Queuer.queueBundle :name=>name,
@@ -78,7 +78,7 @@ module Manga
         $log = []
 
         Manga::Squirrel::ConfigFile.parse(options[:file]) do
-          |name, series, raw, out, autocbz, volume, chapter, cbf, finished|
+          |name, series, raw, out, volume, chapter, cbf, finished|
           if finished then
             puts "Skipping #{name}"
           else

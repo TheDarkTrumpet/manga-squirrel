@@ -16,13 +16,12 @@ module Manga
           name = series[:name].sanitize
           raw = File.expand_path(series[:raw] || config[:raw] || "~/")
           out = File.expand_path(series[:out] || config[:out] || "~/")
-          autocbz = series[:autocbz] || config[:autocbz] || false
           volume = series[:volume] || "true"
           chapter = series[:chapter] || "true"
           cbf = series[:cbf] || config[:cbf] || "cbz"
           finished = series[:finished] || false
 
-          yield name,sclass,raw,out,autocbz,volume,chapter,cbf,finished
+          yield name,sclass,raw,out,volume,chapter,cbf,finished
         end
       end
     end
