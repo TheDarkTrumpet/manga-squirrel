@@ -103,13 +103,16 @@ module Manga
         end
       end
 
-      desc 'fsck series [ --site=site --raw=raw ]', '**SLOW** Looks for missing chapters + pages'
+      desc 'fsck series [ --site=site --raw=raw --daemon=false ]', '**SLOW** Looks for missing chapters + pages'
       method_option :site, :default => 'MangaFox'
       method_option :raw, :default => '.'
+      method_option :daemon, :default => false
       def fsck(series)
+        $isDaemon = options[:daemon]
         site = "Manga::Squirrel::#{options[:site]}Series".to_class
         raw = File.expand_path options[:raw]
         s = site.new :name=>series.sanitize, :root=>raw
+
         expectedChapters = s.chapters
         actualChapters = {}
         Dir.glob(File.join(raw,series.sanitize,"*")).each {
@@ -125,12 +128,14 @@ module Manga
         #Assume expectedChapters has all of them (Dangerous assumption with scanlations, but hey)
         expectedChapters.each_value {
           |expectedChapter|
+          isMissing = false
+
           puts "Testing #{expectedChapter[:chapter]}"
           pbar.inc unless $isDaemon
           if actualChapters[expectedChapter[:chapter].to_f].nil? then
             puts ">>Missing chapter #{expectedChapter[:chapter]}"
-            #self.makequeue QueueAction::Download, {:site=>site, :series=>series, :options=>{:volumes=>"true",:chapters=>expectedChapter[:chapter].to_f}}
             numMissingChapters += 1
+            isMissing = true
           else
             base = gendir(raw, expectedChapter)
             expectedChapter[:pages].each {
@@ -144,13 +149,16 @@ module Manga
               end
               ext = File.basename(page[:url]).gsub(/\.*(\.[^\.]*)$/).first
               actualSize = File.size(File.join(base, "#{outNum(page[:num])}#{ext}")).to_i
-              unless actualSize = expectedSize then
+              unless actualSize == expectedSize then
                 puts ">>Missing  page #{expectedChapter[:chapter]}: #{page[:num]}" unless actualSize > 0
                 puts ">>Corrupt page #{expectedChapter[:chapter]}: #{page[:num]} (#{actualSize} of #{expectedSize})" if actualSize > 0
                 numMissingImages += 1
+                isMissing = true
               end
             }
           end
+
+          Queuer.queueChapter expectedChapter, raw if isMissing
         }
         pbar.finish unless $isDaemon
 

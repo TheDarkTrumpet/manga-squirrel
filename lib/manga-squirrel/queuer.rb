@@ -29,6 +29,10 @@ module Manga
         end
       end
 
+      def self.queueChapter(chapter, raw)
+        Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter, :raw=>raw
+      end
+
       def self.queueBundle(options)
         s = options[:series].new :name=>options[:name], :root=>options[:raw]
         s.existingChapters.each do
