@@ -17,7 +17,7 @@ module Manga
 
           FileUtils.mkdir_p dir = gendir(options[:raw], options[:chapter])
 
-        system 'curl --max-time=60 --retry=3 --silent --speed-time=60 --speed-limit=0 ', imgurl, "-o", File.join(dir, "#{"%03d" % page[:num]}#{ext}")
+        system 'curl --max-time 60 --retry 3 --speed-time 60 --speed-limit 0 ', imgurl, "-o", File.join(dir, "#{"%03d" % page[:num]}#{ext}")
         end
       end
     end
