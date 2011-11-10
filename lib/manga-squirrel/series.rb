@@ -51,8 +51,8 @@ module Manga
           @chapters = YAML::load File.open(path,"r")
         else
           pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
-          #tmp.each { #debug
-           # |array|
+          tmp.each {
+            |array|
             array = tmp[0]
             pbar.inc unless $isDaemon
             url = array[0]
@@ -60,7 +60,7 @@ module Manga
 
             i = getChapterInfo(url,caption)
             @chapters[i[:chapter]] = i
-          #}
+          }
           File.open(path, "w") do
             |file|
             file.puts YAML::dump @chapters
