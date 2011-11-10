@@ -48,21 +48,19 @@ module Manga
         encname = Base64.encode64 @name
         path = File.join(Dir.tmpdir, "ms.#{encname}")
         if File.exists? path then
-          File.open(path, "r").each do
-            |obj|
-          @chapters = YAML::load obj
-          end
+          @chapters = YAML::load File.open(path,"r")
         else
           pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
-          tmp.each { #debug
-            |array|
+          #tmp.each { #debug
+           # |array|
+            array = tmp[0]
             pbar.inc unless $isDaemon
             url = array[0]
             caption = array[1]
 
             i = getChapterInfo(url,caption)
             @chapters[i[:chapter]] = i
-          }
+          #}
           File.open(path, "w") do
             |file|
             file.puts YAML::dump @chapters
