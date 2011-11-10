@@ -53,7 +53,6 @@ module Manga
           pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
           tmp.each {
             |array|
-            array = tmp[0]
             pbar.inc unless $isDaemon
             url = array[0]
             caption = array[1]
