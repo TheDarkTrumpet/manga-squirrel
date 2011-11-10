@@ -3,6 +3,8 @@ require 'nokogiri'
 require 'open-uri'
 require 'progressbar'
 require 'peach'
+require 'base64'
+require 'tmpdir'
 
 module Manga
   module Squirrel
@@ -43,17 +45,30 @@ module Manga
 
       def getChapters()
         tmp = getChapterList
-        pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
-        tmp.peach {
-          |array|
-          pbar.inc unless $isDaemon
-          url = array[0]
-          caption = array[1]
+        encname = Base64.encode64 @name
+        path = File.join(Dir.tmpdir, "ms.#{encname}")
+        if File.exists? path then
+          File.open(path, "r").each do
+            |obj|
+          @chapters = YAML::load obj
+          end
+        else
+          pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
+          tmp.each { #debug
+            |array|
+            pbar.inc unless $isDaemon
+            url = array[0]
+            caption = array[1]
 
-          i = getChapterInfo(url,caption)
-          @chapters[i[:chapter]] = i
-        }
-        pbar.finish unless $isDaemon
+            i = getChapterInfo(url,caption)
+            @chapters[i[:chapter]] = i
+          }
+          File.open(path, "w") do
+            |file|
+            file.puts YAML::dump @chapters
+          end
+          pbar.finish unless $isDaemon
+        end
       end
 
       def getChapterList()
@@ -80,9 +95,14 @@ module Manga
         chapter[:url] = url
 
         chapter[:pages] = getPages(doc, chapter)
-        chapter[:img_div] = self.class::IMG_DIV
 
         chapter
+      end
+
+      def getImageURL(chapter, num)
+        page = getPageURL(chapter, num)
+        doc = Nokogiri::HTML(open(page))
+        doc.css(self.class::IMG_DIV).attribute('src').value
       end
     end
   end
