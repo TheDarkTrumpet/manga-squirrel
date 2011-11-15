@@ -39,14 +39,7 @@ module Manga
 
       def getPages(doc, chapter)
         num_pages = doc.css(PAGES_CSS).to_s.match(PAGES_REGEX)[1].to_i
-        pbar = ProgressBar.new("Pages: C#{chapter[:chapter]}", num_pages) unless $isDaemon
-        ret = num_pages.times.map do
-          |i|
-          pbar.inc unless $isDaemon
-          {:url=>getPageURL(chapter, i+1), :num=>i+1}
-          end
-        pbar.finish unless $isDaemon
-        return ret
+        num_pages.times.map { |i| {:url=>getPageURL(chapter, i+1), :num=>i+1} }
       end
 
       def getPageURL(chapter, page)
