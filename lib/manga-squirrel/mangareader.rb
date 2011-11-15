@@ -46,7 +46,7 @@ module Manga
       end
 
       def getPages(doc, chapter)
-        doc.css(PAGES_CSS).to_s.scan(PAGES_REGEX).map { |x| {:url=>getImageURL(chapter, x[0]), :num=>x[1]} }
+        doc.css(PAGES_CSS).to_s.scan(PAGES_REGEX).map { |x| {:url=>getPageURL(chapter, x[0]), :num=>x[1]} }
       end
 
       def getPageURL(chapter, page)

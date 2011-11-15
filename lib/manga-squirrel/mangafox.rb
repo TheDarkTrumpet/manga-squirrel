@@ -37,7 +37,7 @@ module Manga
         ret = num_pages.times.map do
           |i|
           pbar.inc unless $isDaemon
-          {:url=>getImageURL(chapter, i+1), :num=>i+1}
+          {:url=>getPageURL(chapter, i+1), :num=>i+1}
           end
         pbar.finish unless $isDaemon
         return ret

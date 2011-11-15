@@ -92,14 +92,9 @@ module Manga
         chapter[:url] = url
 
         chapter[:pages] = getPages(doc, chapter)
+        chapter[:img_div] = self.class::IMG_DIV
 
         chapter
-      end
-
-      def getImageURL(chapter, num)
-        page = getPageURL(chapter, num)
-        doc = Nokogiri::HTML(open(page))
-        doc.css(self.class::IMG_DIV).attribute('src').value
       end
     end
   end
