@@ -57,9 +57,12 @@ module Manga
             caption = array[1]
             num = getChapterNumberFromURL(url)
 
-            next if @existingChapters.include? num and not @all
+            if @existingChapters.include? num and not @all
+              i = {:chapter=>num, :caption=>caption, :url=>url}
+            else
+              i = getChapterInfo(url,caption)
+            end
 
-            i = getChapterInfo(url,caption)
             @chapters[i[:chapter]] = i
           }
           File.open(path, "w") do

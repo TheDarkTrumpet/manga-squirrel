@@ -22,7 +22,9 @@ module Manga
 
           FileUtils.mkdir_p dir = gendir(options[:raw], options[:chapter])
 
-          system "curl --max-time 60 --retry 3 --speed-time 60 --speed-limit 0 #{img} -o #{File.join(dir, outNum(page[:num]))}#{ext}"
+          #Run curl to fetch
+          cmd =  "curl --max-time 60 --retry 3 --speed-time 60 --speed-limit 0 -sS #{img} -o \"#{File.join(dir, outNum(page[:num]))}#{ext}\""
+          system cmd
         end
       end
     end

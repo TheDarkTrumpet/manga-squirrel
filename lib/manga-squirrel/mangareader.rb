@@ -11,7 +11,7 @@ module Manga
       SERIES_LIST_CSS = 'div[class^="series_col"]'
       SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/
 
-      CHAPTER_NUMBER_REGEX = /.+\/([\d.]+)/
+      CHAPTER_NUMBER_REGEX = /([\d.]+)/
 
       CHAPTER_LIST_CSS = 'div[id^="chapterlist"]'
       #Gives: url, (name + number), caption
@@ -40,7 +40,7 @@ module Manga
       end
 
       def getChapterNumberFromURL(url)
-        url.match(CHAPTER_NUMBER_REGEX)[0]
+        File.basename(url).match(CHAPTER_NUMBER_REGEX)[1].to_f
       end
 
       def getChapterURLList(doc)

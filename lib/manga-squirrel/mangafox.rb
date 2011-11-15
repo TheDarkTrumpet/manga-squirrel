@@ -26,7 +26,7 @@ module Manga
       end
 
       def getChapterNumberFromURL(url)
-        url.match(CHAPTER_NUMBER_REGEX)[0]
+        url.match(CHAPTER_NUMBER_REGEX)[1].to_f
       end
 
       def getChapterURLList(doc)
