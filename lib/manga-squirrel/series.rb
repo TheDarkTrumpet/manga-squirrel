@@ -9,7 +9,7 @@ require 'tmpdir'
 module Manga
   module Squirrel
     module Series
-      attr_accessor :existingChapters, :name, :root
+      attr_accessor :existingChapters, :name, :root, :all
 
       def initialize(options)
         @name = options[:name]
@@ -19,7 +19,6 @@ module Manga
         @existingChapters = []
 
         getExistingChapters
-        chapters unless options[:dontdownload]
       end
 
       def chapters
@@ -56,6 +55,9 @@ module Manga
             pbar.inc unless $isDaemon
             url = array[0]
             caption = array[1]
+            num = getChapterNumberFromURL(url)
+
+            next if @existingChapters.include? num and not @all
 
             i = getChapterInfo(url,caption)
             @chapters[i[:chapter]] = i

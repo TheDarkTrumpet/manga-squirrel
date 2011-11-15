@@ -8,6 +8,8 @@ module Manga
       BASE_URL = "http://www.mangafox.com"
       IMG_DIV = "#image"
 
+      CHAPTER_NUMBER_REGEX = /.+\/?c([\d.]+)\//
+
       CHAPTER_LIST_CSS = 'table#listing td a.ch'
 
       CHAPTER_INFO_CSS = 'meta[property="og:title"]'
@@ -21,6 +23,10 @@ module Manga
       def getSeriesURL()
         #Because of mangafox's systematic naming system - we can always find them
         "#{BASE_URL}/manga/#{urlify(@name.strip)}"
+      end
+
+      def getChapterNumberFromURL(url)
+        url.match(CHAPTER_NUMBER_REGEX)[0]
       end
 
       def getChapterURLList(doc)

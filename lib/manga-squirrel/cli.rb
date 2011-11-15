@@ -112,6 +112,7 @@ module Manga
         site = "Manga::Squirrel::#{options[:site]}Series".to_class
         raw = File.expand_path options[:raw]
         s = site.new :name=>series.sanitize, :root=>raw
+        s.all = true
 
         expectedChapters = s.chapters
         actualChapters = {}
