@@ -17,6 +17,7 @@ module Manga
 
         @chapters = {}
         @existingChapters = []
+        @existingChapterInfo = {}
 
         getExistingChapters
       end
@@ -38,7 +39,9 @@ module Manga
       def getExistingChapters()
         Dir.glob(File.join(@root, @name, "*")).each do
           |chapter|
-          @existingChapters.push revgendir(chapter)[:chapter].to_f
+          i = revgendir(chapter)
+          @existingChapters.push i[:chapter]
+          @existingChapterInfo[i[:chapter]] = i
         end
       end
 
@@ -48,6 +51,7 @@ module Manga
         path = File.join(Dir.tmpdir, "ms.#{encname}")
         if File.exists? path then
           @chapters = YAML::load File.open(path,"r")
+          return
         else
           pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
           tmp.each {
@@ -56,9 +60,10 @@ module Manga
             url = array[0]
             caption = array[1]
             num = getChapterNumberFromURL(url)
+            volume = @existingChapterInfo[num][:volume]
 
             if @existingChapters.include? num and not @all
-              i = {:chapter=>num, :caption=>caption, :url=>url}
+              i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>volume}
             else
               i = getChapterInfo(url,caption)
             end
