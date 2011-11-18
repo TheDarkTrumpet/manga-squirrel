@@ -60,10 +60,9 @@ module Manga
             url = array[0]
             caption = array[1]
             num = getChapterNumberFromURL(url)
-            volume = @existingChapterInfo[num][:volume]
 
             if @existingChapters.include? num and not @all
-              i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>volume}
+              i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>@existingChapterInfo[num][:volume]}
             else
               i = getChapterInfo(url,caption)
             end
