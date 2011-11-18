@@ -58,8 +58,11 @@ module Manga
             |array|
             pbar.inc unless $isDaemon
             url = array[0]
-            caption = array[1]
             num = getChapterNumberFromURL(url)
+            caption = array[1]
+            unless caption
+              caption = (@existingChapterInfo.include? num) ? @existingChapterInfo[num][:caption] : nil
+            end
 
             if @existingChapters.include? num and not @all
               i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>@existingChapterInfo[num][:volume]}
