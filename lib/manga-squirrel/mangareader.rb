@@ -17,9 +17,9 @@ module Manga
       #Gives: url, (name + number), caption
       CHAPTER_LIST_REGEX = /<a href="([^"]*)">([^<]*)<\/a> : ([^<]*)<\/td>/
 
-      CHAPTER_INFO_CSS = 'meta[name="description"]'
+      CHAPTER_INFO_CSS = 'title'
       #Gives: series, -  chapter, page
-      CHAPTER_INFO_REGEX = /(.+) ([0-9]+) - Read .* Page ([0-9]+)\./
+      CHAPTER_INFO_REGEX = /(.+) ([0-9]+) - Read .* Page ([0-9]+)/
 
       PAGES_CSS = 'select[id^="pageMenu"]'
       PAGES_REGEX = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
