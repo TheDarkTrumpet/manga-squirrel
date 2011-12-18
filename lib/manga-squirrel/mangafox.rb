@@ -1,23 +1,24 @@
 require 'manga-squirrel/series'
+require 'ap'
 
 module Manga
   module Squirrel
     class Manga::Squirrel::MangaFoxSeries
       include Manga::Squirrel::Series
 
-      BASE_URL = "http://www.mangafox.com"
-      IMG_DIV = "#image"
+      BASE_URL = "http://m.mangafox.com"
+      IMG_DIV = "body>p>a>img"
 
       CHAPTER_NUMBER_REGEX = /.+\/?c([\d.]+)\//
 
-      CHAPTER_LIST_CSS = 'table#listing td a.ch'
+      CHAPTER_LIST_CSS = 'ol a'
 
-      CHAPTER_INFO_CSS = 'meta[property="og:title"]'
+      CHAPTER_INFO_CSS = 'title'
       #Gives series, x, volume, chapter, caption
-      CHAPTER_INFO_REGEX = /(.*?) Manga (Vol\.([X0-9]+) )?Ch\.([0-9\.]+):? ?(.*)$/
+      CHAPTER_INFO_REGEX = /: (.*?)( Vol.([X0-9]+) )?Ch.([0-9\.]+):? ?(.*)$/
 
-      PAGES_CSS = 'script'
-      PAGES_REGEX = /var\s+total_pages\s*=\s*(\d+);/
+      PAGES_CSS = 'body'
+      PAGES_REGEX = /Page: (([0-9]+), )+Next Chapter/
 
       private
       def getSeriesURL()
@@ -29,8 +30,30 @@ module Manga
         url.match(CHAPTER_NUMBER_REGEX)[1].to_f
       end
 
+      def parseChapterURLList(doc)
+        doc.collect { |node| [node.attribute('href').value, nil] }.reverse
+      end
+
       def getChapterURLList(doc)
-        doc.collect { |node| [BASE_URL + node.attribute('href').value, nil] }.reverse
+        list = parseChapterURLList(doc)
+        #Because mobile site paginates these links, need to check for more...
+        nextPage = 2
+        lastChaptersAdded = list
+        while true do
+          url = File.join(getSeriesURL(), "#{nextPage}.htm");
+          docn = Nokogiri::HTML(open(url))
+
+          toAdd = parseChapterURLList(docn.css(CHAPTER_LIST_CSS))
+          if toAdd == lastChaptersAdded then
+            break
+          else
+            toAdd.each { |x| list.push x }
+            lastChaptersAdded = toAdd
+            nextPage += 1
+          end
+        end
+
+        list
       end
 
       def getChapterInfoProcess(t)
@@ -38,7 +61,7 @@ module Manga
       end
 
       def getPages(doc, chapter)
-        num_pages = doc.css(PAGES_CSS).to_s.match(PAGES_REGEX)[1].to_i
+        num_pages = doc.at_css(PAGES_CSS).text.match(PAGES_REGEX)[1].to_i
         num_pages.times.map { |i| {:url=>getPageURL(chapter, i+1), :num=>i+1} }
       end
 

@@ -91,7 +91,7 @@ module Manga
         chapter = {}
 
         doc = Nokogiri::HTML(open(url))
-        title = doc.css(self.class::CHAPTER_INFO_CSS).attribute('content').value.scan(self.class::CHAPTER_INFO_REGEX)[0]
+        title = doc.at_css(self.class::CHAPTER_INFO_CSS).text.scan(self.class::CHAPTER_INFO_REGEX)[0]
 
         chapter[:series],chapter[:volume],chapter[:chapter],otherCaption = getChapterInfoProcess(title)
 
