@@ -56,7 +56,7 @@ module Manga
       end
 
       def getChapterInfoProcess(t)
-        return t[1],t[3],t[4].to_f,t[5]
+        return @name,t[3],t[4].to_f,t[5]
       end
 
       def getPages(doc, chapter)
