@@ -14,7 +14,7 @@ module Manga
 
       CHAPTER_INFO_CSS = 'title'
       #Gives series, x, volume, chapter, caption
-      CHAPTER_INFO_REGEX = /:? (.*?)( Vol.([X0-9]+) )?Ch.([0-9\.]+):? ?(.*)$/
+      CHAPTER_INFO_REGEX = /(: )?(.*?)( Vol.([X0-9]+) )?Ch.([0-9\.]+):? ?(.*)( - Manga Fox Mobile)+$/
 
       PAGES_CSS = 'body'
       PAGES_REGEX = /Page: (([0-9]+), )+Next Chapter/
@@ -56,7 +56,7 @@ module Manga
       end
 
       def getChapterInfoProcess(t)
-        return t[0],t[2],t[3].to_f,t[4]
+        return t[1],t[3],t[4].to_f,t[5]
       end
 
       def getPages(doc, chapter)
