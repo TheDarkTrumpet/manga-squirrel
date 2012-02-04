@@ -1,5 +1,4 @@
 require 'manga-squirrel/series'
-require 'ap'
 
 module Manga
   module Squirrel
@@ -15,7 +14,7 @@ module Manga
 
       CHAPTER_INFO_CSS = 'title'
       #Gives series, x, volume, chapter, caption
-      CHAPTER_INFO_REGEX = /: (.*?)( Vol.([X0-9]+) )?Ch.([0-9\.]+):? ?(.*)$/
+      CHAPTER_INFO_REGEX = /:? (.*?)( Vol.([X0-9]+) )?Ch.([0-9\.]+):? ?(.*)$/
 
       PAGES_CSS = 'body'
       PAGES_REGEX = /Page: (([0-9]+), )+Next Chapter/
