@@ -22,7 +22,8 @@ module Manga
       private
       def getSeriesURL()
         #Because of mangafox's systematic naming system - we can always find them
-        "#{BASE_URL}/manga/#{urlify(@name.strip)}"
+        url = "#{BASE_URL}/manga/#{urlify(@name.strip)}?no_warning=1"
+        return url
       end
 
       def getChapterNumberFromURL(url)
