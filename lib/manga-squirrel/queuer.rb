@@ -39,6 +39,9 @@ module Manga
           |chapter_number|
 
           chapter = s.chapters[chapter_number]
+          if chapter == nil
+            next
+          end
           chapter[:out] = options[:out]
 
           file = bundlePath chapter[:out], chapter, options[:cbf]
