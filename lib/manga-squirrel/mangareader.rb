@@ -25,7 +25,7 @@ module Manga
       PAGES_REGEX = /<option value=\"([^']*?)\"[^>]*>\s*(\d*)<\/option>/
 
       private
-      def getSeriesURL()
+      def getSeriesURL(warn=false)
         #Because of mangareader's random system, we need to go look it up
         doc = Nokogiri::HTML(open(BASE_URL + "/alphabetical"))
         seriesList = doc.css(SERIES_LIST_CSS).to_s

@@ -19,10 +19,15 @@ module Manga
       PAGES_CSS = 'body'
       PAGES_REGEX = /Page: (([0-9]+), )+Next Chapter/
 
+      NO_WARNING = "?no_warning=1"
+
       private
-      def getSeriesURL()
+      def getSeriesURL(warn=false)
         #Because of mangafox's systematic naming system - we can always find them
-        url = "#{BASE_URL}/manga/#{urlify(@name.strip)}?no_warning=1"
+        url = "#{BASE_URL}/manga/#{urlify(@name.strip)}"
+        if warn then
+          url += NO_WARNING
+        end
         return url
       end
 
@@ -40,7 +45,7 @@ module Manga
         nextPage = 2
         lastChaptersAdded = list
         while true do
-          url = File.join(getSeriesURL(), "#{nextPage}.htm");
+          url = File.join(getSeriesURL(), "#{nextPage}.htm#{NO_WARNING}");
           docn = Nokogiri::HTML(open(url))
 
           toAdd = parseChapterURLList(docn.css(CHAPTER_LIST_CSS))
@@ -53,7 +58,7 @@ module Manga
           end
         end
 
-        list
+        return list
       end
 
       def getChapterInfoProcess(t)

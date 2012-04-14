@@ -70,7 +70,7 @@ module Manga
       end
 
       def getChapterList()
-        url = getSeriesURL()
+        url = getSeriesURL(true)
 
         doc = Nokogiri::HTML(open(url))
         getChapterURLList(doc.css(self.class::CHAPTER_LIST_CSS))
