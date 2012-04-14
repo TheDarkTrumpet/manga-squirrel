@@ -47,37 +47,26 @@ module Manga
 
       def getChapters()
         tmp = getChapterList
-        encname = Base64.encode64 @name
-        path = File.join(Dir.tmpdir, "ms.#{encname}")
-        if File.exists? path then
-          @chapters = YAML::load File.open(path,"r")
-          return
-        else
-          pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
-          tmp.each {
-            |array|
-            pbar.inc unless $isDaemon
-            url = array[0]
-            num = getChapterNumberFromURL(url)
-            caption = array[1]
-            unless caption
-              caption = (@existingChapterInfo.include? num) ? @existingChapterInfo[num][:caption] : nil
-            end
-
-            if @existingChapters.include? num and not @all
-              i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>@existingChapterInfo[num][:volume]}
-            else
-              i = getChapterInfo(url,caption)
-            end
-
-            @chapters[i[:chapter]] = i
-          }
-          File.open(path, "w") do
-            |file|
-            file.puts YAML::dump @chapters
+        pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
+        tmp.each {
+          |array|
+          pbar.inc unless $isDaemon
+          url = array[0]
+          num = getChapterNumberFromURL(url)
+          caption = array[1]
+          unless caption
+            caption = (@existingChapterInfo.include? num) ? @existingChapterInfo[num][:caption] : nil
           end
-          pbar.finish unless $isDaemon
-        end
+
+          if @existingChapters.include? num and not @all
+            i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>@existingChapterInfo[num][:volume]}
+          else
+            i = getChapterInfo(url,caption)
+          end
+
+          @chapters[i[:chapter]] = i
+        }
+        pbar.finish unless $isDaemon
       end
 
       def getChapterList()
