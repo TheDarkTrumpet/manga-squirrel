@@ -8,8 +8,7 @@ module Manga
       BASE_URL = "http://www.mangareader.net"
       IMG_DIV = "#img"
 
-      SERIES_LIST_CSS = 'div[class^="series_col"]'
-      SERIES_LIST_REGEX = /<li>$*<a href="([^"]*)">([^<]*)<\/a>/
+      SERIES_LIST_CSS = 'div[class^="series_col"] li a'
 
       CHAPTER_NUMBER_REGEX = /([\d.]+)/
 
@@ -28,15 +27,14 @@ module Manga
       def getSeriesURL(warn=false)
         #Because of mangareader's random system, we need to go look it up
         doc = Nokogiri::HTML(open(BASE_URL + "/alphabetical"))
-        seriesList = doc.css(SERIES_LIST_CSS).to_s
-        series = {}
-        seriesList.scan(SERIES_LIST_REGEX).each {
+        seriesList = doc.css(SERIES_LIST_CSS)
+        seriesList.each {
           |s|
-          if urlify(@name.strip) == urlify(s[1].strip)
-            return BASE_URL + s[0]
+          if urlify(@name.strip) == urlify(s.child.to_s.strip)
+            return BASE_URL + s['href']
           end
         }
-        raise SeriesNotFound
+        raise FileNotFound
       end
 
       def getChapterNumberFromURL(url)
