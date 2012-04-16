@@ -61,7 +61,7 @@ module Manga
           if @existingChapters.include? num and not @all
             i = {:chapter=>num, :caption=>caption, :url=>url, :series=>@name, :volume=>@existingChapterInfo[num][:volume]}
           else
-            i = getChapterInfo(url,caption)
+            i = getChapterInfo(url,num,caption)
           end
 
           @chapters[i[:chapter]] = i
@@ -76,13 +76,17 @@ module Manga
         getChapterURLList(doc.css(self.class::CHAPTER_LIST_CSS))
       end
 
-      def getChapterInfo(url, caption)
+      def getChapterInfo(url, num, caption)
         chapter = {}
 
         doc = Nokogiri::HTML(open(url))
         title = doc.at_css(self.class::CHAPTER_INFO_CSS).text.scan(self.class::CHAPTER_INFO_REGEX)[0]
 
         chapter[:series],chapter[:volume],chapter[:chapter],otherCaption = getChapterInfoProcess(title)
+
+        if chapter[:chapter] != num
+          chapter[:chapter] = num
+        end
 
         if caption.nil? then
           chapter[:caption] = otherCaption
@@ -94,6 +98,8 @@ module Manga
 
         chapter[:pages] = getPages(doc, chapter)
         chapter[:img_div] = self.class::IMG_DIV
+
+        pp chapter
 
         chapter
       end
