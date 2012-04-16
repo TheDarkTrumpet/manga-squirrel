@@ -31,7 +31,7 @@ module Manga
         seriesList.each {
           |s|
           if urlify(@name.strip) == urlify(s.child.to_s.strip)
-            return  s['href']
+            return BASE_URL + s['href']
           end
         }
         raise FileNotFound
