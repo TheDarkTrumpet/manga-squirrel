@@ -7,7 +7,7 @@ module Manga
       include Manga::Squirrel::Series
 
       BASE_URL = "http://manga.redhawkscans.com/reader/"
-      IMG_DIV = "body>div.inner>a>img.open"
+      IMG_DIV = "div.inner>a>img.open"
 
       SERIES_LIST_CSS = 'div.panel div.title>a'
 
@@ -63,7 +63,7 @@ module Manga
       def getPages(doc, chapter)
         doc.css(PAGES_CSS).collect {
           |pagedoc|
-          {:url=>pagedoc['href'], :num=>pagedoc.child.to_s.match(PAGES_REGEX)[1]}
+          {:url=>pagedoc['href'], :num=>pagedoc.child.to_s.match(PAGES_REGEX)[1].to_i}
         }
       end
 
