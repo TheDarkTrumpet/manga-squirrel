@@ -116,45 +116,56 @@ module Manga
 
         expectedChapters = s.chapters
         actualChapters = {}
-        Dir.glob(File.join(raw,series.sanitize,"*")).each {
-          |chapter|
-          info = revgendir(chapter)
-          actualChapters[info[:chapter]] = info
-        }
 
         numMissingChapters = 0
         numMissingImages = 0
 
         pbar = ProgressBar.new("fsck",expectedChapters.count) unless $isDaemon
         #Assume expectedChapters has all of them (Dangerous assumption with scanlations, but hey)
-        expectedChapters.each_value {
+        expectedChapters.values.reverse.each {
           |expectedChapter|
           isMissing = false
 
-          puts "Testing #{expectedChapter[:chapter]}"
           pbar.inc unless $isDaemon
-          if actualChapters[expectedChapter[:chapter].to_f].nil? then
+          path = gendir(raw, expectedChapter)
+          puts "Testing #{expectedChapter[:chapter]} at #{path}"
+          if !File.directory? path then
             puts ">>Missing chapter #{expectedChapter[:chapter]}"
             numMissingChapters += 1
             isMissing = true
           else
-            base = gendir(raw, expectedChapter)
             expectedChapter[:pages].each {
               |page|
-              uri = URI(page[:url])
-              expectedSize = 0
-              Net::HTTP.start(uri.host, uri.port) do
-                |http|
-                request = http.request_head(page[:url])
-                expectedSize = request['content-length'].to_i
+              i = 1
+              begin
+                url, ext = processDownload page, {:chapter=>{:img_div=>site::IMG_DIV}}
+                uri = URI(URI.encode url)
+                expectedSize = 0
+                i = i + 1
+                Net::HTTP.start(uri.host, uri.port) do
+                  |http|
+                  request = http.request_head(URI.encode url)
+                  expectedSize = request['content-length'].to_i
+                end
+              rescue Timeout::Error
+                puts "!Stalling due to network"
+                sleep i
+                continue if i > 10
+                retry
               end
-              ext = File.basename(page[:url]).gsub(/\.*(\.[^\.]*)$/).first
-              actualSize = File.size(File.join(base, "#{outNum(page[:num])}#{ext}")).to_i
+              expectedPath = File.join(path, "#{outNum(page[:num])}#{ext}")
+              if File.exists? expectedPath then
+                actualSize = File.size(expectedPath).to_i
+              else
+                actualSize = 0
+              end
+              puts "Checking page #{page[:url]} image #{url} size #{actualSize} expecting #{expectedSize}"
               unless actualSize == expectedSize then
                 puts ">>Missing  page #{expectedChapter[:chapter]}: #{page[:num]}" unless actualSize > 0
                 puts ">>Corrupt page #{expectedChapter[:chapter]}: #{page[:num]} (#{actualSize} of #{expectedSize})" if actualSize > 0
                 numMissingImages += 1
                 isMissing = true
+                break
               end
             }
           end

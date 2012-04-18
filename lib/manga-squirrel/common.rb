@@ -2,6 +2,7 @@ require 'fileutils'
 require 'manga-squirrel/mangafox'
 require 'manga-squirrel/mangareader'
 require 'manga-squirrel/redhawk'
+require 'uri'
 
 def gendir(raw, chapter)
   File.join(raw, chapter[:series].to_s.sanitize, "#{[chapter[:volume], "#{outNum chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].to_s.sanitize}")
@@ -14,6 +15,13 @@ end
 
 def bundlePath (root, chapter, cbf)
   "#{gendir root, chapter}.#{cbf}"
+end
+
+def processDownload(page, options)
+  doc = Nokogiri::HTML(open(URI.encode(page[:url])))
+  img = doc.css(options[:chapter][:img_div]).attribute('src').value
+  ext = img.gsub(/\.*(\.[^\.]*)$/).first
+  return img, ext
 end
 
 #Within limits reverses the gendir procedure
