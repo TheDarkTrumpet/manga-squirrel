@@ -38,7 +38,7 @@ module Manga
       end
 
       desc 'bundle [ --file=name --force=false --daemon=false]', 'Builds comic book archives for all new chapters for all the series listed in filename'
-      method_option :file, :default=> "~/.ms"
+      method_option :file, :default=> $config.config.home.to_s
       method_option :force, :default => false
       method_option :daemon, :default => false
       def bundle()
@@ -70,7 +70,7 @@ module Manga
       end
 
       desc 'fetch [ --file=name --daemon=false ]', 'Tries to fetch all series listed in filename, skipping any chapters already existing'
-      method_option :file, :default => "~/.ms"
+      method_option :file, :default => $config.config.home.to_s
       method_option :daemon, :default => false
       def fetch
 

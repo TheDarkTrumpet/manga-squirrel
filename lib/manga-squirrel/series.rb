@@ -4,7 +4,7 @@ require 'open-uri'
 require 'progressbar'
 require 'peach'
 require 'base64'
-require 'tmpdir'
+require 'manga-squirrel/common'
 
 module Manga
   module Squirrel
@@ -48,7 +48,7 @@ module Manga
       def getChapters()
         tmp = getChapterList
         encname = Base64.encode64 @name
-        path = File.join(Dir.tmpdir, "ms.#{encname}")
+        path = File.join($config.cache.home.to_s, "ms.#{encname}")
         if File.exists? path then
           @chapters = YAML::load File.open(path,"r")
           return
@@ -93,7 +93,9 @@ module Manga
         doc = Nokogiri::HTML(open(url))
         title = doc.at_css(self.class::CHAPTER_INFO_CSS).text.scan(self.class::CHAPTER_INFO_REGEX)[0]
 
-        chapter[:series],chapter[:volume],chapter[:chapter],otherCaption = getChapterInfoProcess(title)
+        s, chapter[:volume],chapter[:chapter],otherCaption = getChapterInfoProcess(title)
+
+        chapter[:series] = @name
 
         if chapter[:chapter] != num
           chapter[:chapter] = num

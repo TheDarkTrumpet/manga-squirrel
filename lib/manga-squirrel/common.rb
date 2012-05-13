@@ -3,6 +3,7 @@ require 'manga-squirrel/mangafox'
 require 'manga-squirrel/mangareader'
 require 'manga-squirrel/redhawk'
 require 'uri'
+require 'xdg'
 
 def gendir(raw, chapter)
   File.join(raw, chapter[:series].to_s.sanitize, "#{[chapter[:volume], "#{outNum chapter[:chapter]}"].compact.join('-')} #{chapter[:caption].to_s.sanitize}")
@@ -67,3 +68,12 @@ class Hash
     return hash
   end
 end
+
+class MSConfig
+  include XDG::BaseDir::Mixin
+
+  def subdirectory
+    'ms'
+  end
+end
+$config = MSConfig.new
