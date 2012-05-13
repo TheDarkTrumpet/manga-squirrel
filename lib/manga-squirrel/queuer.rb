@@ -10,22 +10,26 @@ module Manga
     class Manga::Squirrel::Queuer
       def self.queueDownload(options)
 
-        s = options[:series].new :name=>options[:name], :root=>options[:raw]
+        begin
+          s = options[:series].new :name=>options[:name], :root=>options[:raw]
 
-        if s.chapters.nil? then
-          puts "ERROR: no chapters retrieved"
-          return
-        end
-
-        s.chapters.each_value do
-          |chapter|
-          if s.existingChapters.include?(chapter[:chapter])
-            next
+          if s.chapters.nil? then
+            puts "ERROR: no chapters retrieved"
+            return
           end
-          Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
-                                                          :raw=>options[:raw]
 
-          $log.push chapter
+          s.chapters.each_value do
+            |chapter|
+            if s.existingChapters.include?(chapter[:chapter])
+              next
+            end
+            Resque.enqueue Manga::Squirrel::DownloadWorker, :chapter=>chapter,
+                                                            :raw=>options[:raw]
+
+            $log.push chapter
+          end
+        rescue
+          puts "Failed to finish downloading this series, unexpected error: #{$!}"
         end
       end
 
@@ -34,29 +38,33 @@ module Manga
       end
 
       def self.queueBundle(options)
-        s = options[:series].new :name=>options[:name], :root=>options[:raw]
-        s.existingChapters.each do
-          |chapter_number|
+        begin
+          s = options[:series].new :name=>options[:name], :root=>options[:raw]
+          s.existingChapters.each do
+            |chapter_number|
 
-          chapter = s.chapters[chapter_number]
-          if chapter == nil
-            next
-          end
-          chapter[:out] = options[:out]
-
-          file = bundlePath chapter[:out], chapter, options[:cbf]
-
-          if File.exists? file then
-            if File.size(file) > 1024 and not options[:force] then
+            chapter = s.chapters[chapter_number]
+            if chapter == nil
               next
             end
-          end
+            chapter[:out] = options[:out]
 
-          Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter,
-                                                        :raw=>options[:raw],
-                                                        :out=>options[:out],
-                                                        :cbf=>options[:cbf]
-          $log.push chapter
+            file = bundlePath chapter[:out], chapter, options[:cbf]
+
+            if File.exists? file then
+              if File.size(file) > 1024 and not options[:force] then
+                next
+              end
+            end
+
+            Resque.enqueue Manga::Squirrel::BundleWorker, :chapter=>chapter,
+                                                          :raw=>options[:raw],
+                                                          :out=>options[:out],
+                                                          :cbf=>options[:cbf]
+            $log.push chapter
+          end
+        rescue
+            puts "Failed to finish bundling this series, unexpected error: #{$!}"
         end
       end
     end
