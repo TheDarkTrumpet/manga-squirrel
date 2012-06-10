@@ -1,5 +1,4 @@
 require 'manga-squirrel/series'
-require 'pp'
 
 module Manga
   module Squirrel

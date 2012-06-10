@@ -51,8 +51,9 @@ module Manga
         path = File.join($config.cache.home.to_s, "ms.#{encname}")
         if File.exists? path then
           @chapters = YAML::load File.open(path,"r")
-          return
-        else
+        end
+
+        if tmp.count != @chapters.count then
           pbar = ProgressBar.new(@name,tmp.count) unless $isDaemon
           tmp.each {
             |array|
